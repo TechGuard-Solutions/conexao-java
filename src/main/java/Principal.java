@@ -6,12 +6,12 @@ public class Principal {
     public static void main(String[] args) {
         Usuario user = new Usuario();
         UsuarioDao usuarioDao = new UsuarioDao();
-        user.setIdUsuario(4);
-        user.setNomeUsuario("Ana");
+        user.setIdUsuario(5);
+        user.setNomeUsuario("Samara");
         user.setSenhaUsuario("1234");
         user.setCpf("01234567891011");
-        user.setEmailUsuario("ana@gmail.com");
-        user.setTelUsuario("(11)90001-2094");
+        user.setEmailUsuario("samara@gmail.com");
+        user.setTelUsuario("(11)92211-2094");
         user.setFkEmpresa(1);
         user.setFkTipoUsuario(1);
 
