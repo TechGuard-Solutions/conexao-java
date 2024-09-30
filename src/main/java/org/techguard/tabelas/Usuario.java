@@ -1,6 +1,7 @@
 package org.techguard.tabelas;
 
 public class Usuario {
+    // Criação dos objetos referentes aos atributos no banco de dados
     private int idUsuario;
     private String nomeUsuario;
     private String senhaUsuario;
@@ -10,6 +11,7 @@ public class Usuario {
     private int fkEmpresa;
     private int fkTipoUsuario;
 
+    // Getters e Setters
     public int getIdUsuario() {
         return idUsuario;
     }
