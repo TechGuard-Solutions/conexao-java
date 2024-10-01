@@ -29,26 +29,31 @@ public class LeituraBucket {
         try (InputStream inputStream = s3.getObject(getObjectRequest);
              Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
 
-            Sheet sheet = workbook.getSheetAt(0); // Obtém a primeira folha
+            // Itera através de todas as folhas do workbook
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+                System.out.println("Folha: " + sheet.getSheetName()); // Nome da folha
 
-            // Itera pelas linhas e células da folha
-            for (Row row : sheet) {
-                for (Cell cell : row) {
-                    switch (cell.getCellType()) {
-                        case STRING:
-                            System.out.print(cell.getStringCellValue() + "\t");
-                            break;
-                        case NUMERIC:
-                            System.out.print(cell.getNumericCellValue() + "\t");
-                            break;
-                        case BOOLEAN:
-                            System.out.print(cell.getBooleanCellValue() + "\t");
-                            break;
-                        default:
-                            System.out.print("Unknown type\t");
+                // Itera pelas linhas e células da folha
+                for (Row row : sheet) {
+                    for (Cell cell : row) {
+                        switch (cell.getCellType()) {
+                            case STRING:
+                                System.out.print(cell.getStringCellValue() + "\t");
+                                break;
+                            case NUMERIC:
+                                System.out.print(cell.getNumericCellValue() + "\t");
+                                break;
+                            case BOOLEAN:
+                                System.out.print(cell.getBooleanCellValue() + "\t");
+                                break;
+                            default:
+                                System.out.print("Unknown type\t");
+                        }
                     }
+                    System.out.println();
                 }
-                System.out.println();
+                System.out.println(); // Adiciona uma linha em branco entre as folhas
             }
 
         } catch (IOException e) {
