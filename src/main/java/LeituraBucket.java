@@ -11,8 +11,8 @@ import java.io.InputStream;
 public class LeituraBucket {
     public static void main(String[] args) {
         String bucketName = "techguard-bucket";
-        String key = "basededados.xlsx"; // Altere para a chave do seu arquivo
-        Region region = Region.US_EAST_1; // Substitua pela sua região
+        String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
+        Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
 
         S3Client s3 = S3Client.builder()
                 .region(region)
