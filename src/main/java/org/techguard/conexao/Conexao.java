@@ -5,12 +5,18 @@ import java.sql.SQLException;
 
 public class Conexao {
 
+    // Classes privadas, estáticas e "final" são classes que são usadas como cópia em outra classe
+    // (sendo que todas precisam da conexão) e são imutáveis
+    // Classes de url do banco, nome e senha do usuário
     private static final String url = "jdbc:mysql://localhost:3306/techguard";
     private static final String user = "root";
     private static final String password = "pedro123";
 
+    // Objeto de conexão
     public static Connection conn;
 
+    // Classe que funciona puxando a conexão do banco
+    // Basicamente tenta fazer a conexão, caso não consiga, retorna um erro
     public static Connection getConexao() {
         try {
             if (conn == null) {
