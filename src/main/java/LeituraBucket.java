@@ -1,43 +1,66 @@
+import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import java.nio.file.Paths;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
 
 public class LeituraBucket {
-//CREDÊNCIAS E INICIALIZAÇÃO DA CONSTRUÇÃO DE UM CLIENTE S3
-public static class S3ReadFile {
     public static void main(String[] args) {
-        String bucketName = "s3-raw-lab11";
-        String key = "arquivoBucket/conexao-java/basededados.xlsx";
-        Region region = Region.US_EAST_1; // região do bucket
+        String bucketName = "techguard-bucket";
+        String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
+        Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
 
         S3Client s3 = S3Client.builder()
                 .region(region)
                 .credentialsProvider(ProfileCredentialsProvider.create())
                 .build();
 
-// construção de um novo objeto
-// solicitar um arquivo específico de um bucket no Amazon S3.
-
-
+        // Construção de um novo objeto para solicitar o arquivo específico de um bucket no Amazon S3.
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(key)
                 .build();
 
+        // Lendo o conteúdo do arquivo diretamente do S3
+        try (InputStream inputStream = s3.getObject(getObjectRequest);
+             Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
 
-            //aqui ele irá fazer a tentativa de verificar se o arquivo fez a leitura e foi baixado localmente
+            // Itera através de todas as folhas do workbook
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+                System.out.println("Folha: " + sheet.getSheetName()); // Nome da folha
 
-        try {
-            s3.getObject(getObjectRequest, Paths.get("arquivo-baixado.xlsx"));
-            String content = new String(Files.readAllBytes(Paths.get("arquivo-baixado.xlsx")));
-            System.out.println("Conteúdo do arquivo: " + content);
+                // Itera pelas linhas e células da folha
+                for (Row row : sheet) {
+                    for (Cell cell : row) {
+                        switch (cell.getCellType()) {
+                            case STRING:
+                                System.out.print(cell.getStringCellValue() + "\t");
+                                break;
+                            case NUMERIC:
+                                System.out.print(cell.getNumericCellValue() + "\t");
+                                break;
+                            case BOOLEAN:
+                                System.out.print(cell.getBooleanCellValue() + "\t");
+                                break;
+                            default:
+                                System.out.print("Unknown type\t");
+                        }
+                    }
+                    System.out.println();
+                }
+                System.out.println(); // Adiciona uma linha em branco entre as folhas
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (Exception e) {
-            System.err.println("Erro ao baixar o arquivo do S3: " + e.getMessage());
+        } finally {
+            // Feche o cliente S3
+            s3.close();
         }
-        }
-}}
+    }
+}
