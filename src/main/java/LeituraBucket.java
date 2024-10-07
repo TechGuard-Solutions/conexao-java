@@ -7,12 +7,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class LeituraBucket {
     public static void main(String[] args) {
-        String bucketName = "s3-raw-lab11";
-        String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
-        Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
+        String bucketName = "s3-sprint";
+        String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
+        Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
         S3Client s3 = S3Client.builder()
                 .region(region)
@@ -42,7 +44,14 @@ public class LeituraBucket {
                                 System.out.print(cell.getStringCellValue() + "\t");
                                 break;
                             case NUMERIC:
-                                System.out.print(cell.getNumericCellValue() + "\t");
+                                if (DateUtil.isCellDateFormatted(cell)) {
+                                    // Converte o valor numérico para uma data
+                                    Date date = cell.getDateCellValue();
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy"); // Formato de data
+                                    System.out.print(dateFormat.format(date) + "\t");
+                                } else {
+                                    System.out.print(cell.getNumericCellValue() + "\t");
+                                }
                                 break;
                             case BOOLEAN:
                                 System.out.print(cell.getBooleanCellValue() + "\t");
@@ -51,7 +60,7 @@ public class LeituraBucket {
                                 System.out.print("Unknown type\t");
                         }
                     }
-                    System.out.println();
+                    System.out.println(); // Pula para a próxima linha
                 }
                 System.out.println(); // Adiciona uma linha em branco entre as folhas
             }
