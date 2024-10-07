@@ -10,8 +10,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.IOException;
 import java.io.InputStream;
 
-    public class LeituraBucket {
-        String bucketName = "s3";
+public class LeituraBucket {
+    public void lerBucket(){
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
         Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
 
@@ -64,4 +65,5 @@ import java.io.InputStream;
             s3.close();
         }
     }
+}
 
