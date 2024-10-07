@@ -10,7 +10,7 @@ import java.io.InputStream;
 
 public class LeituraBucket {
     public static void main(String[] args) {
-        String bucketName = "s3-raw-lab11";
+        String bucketName = "bucket-base-de-dados";
         String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
         Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
 
