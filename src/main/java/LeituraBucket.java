@@ -38,27 +38,49 @@ public class LeituraBucket {
 
                 // Itera pelas linhas e células da folha
                 for (Row row : sheet) {
+
                     for (Cell cell : row) {
+
+                        if (cell.getColumnIndex() != 0 && cell.getColumnIndex() != 1 &&
+                                cell.getColumnIndex() != 2 && cell.getColumnIndex() != 5 &&
+                                cell.getColumnIndex() != 6 && cell.getColumnIndex() != 7 &&
+                                cell.getColumnIndex() != 49) {
+                            continue;
+                        }
+
+                        if (cell.getCellType() == CellType.STRING &&
+                                (cell.getStringCellValue().toUpperCase().contains("UNKNOWN") ||
+                                        cell.getStringCellValue().toUpperCase().contains("N/A"))) {
+                            continue;
+                        }
+
+
                         switch (cell.getCellType()) {
                             case STRING:
-                                System.out.print(cell.getStringCellValue() + "\t");
+                                System.out.print(cell.getStringCellValue() + "; \t");
                                 break;
                             case NUMERIC:
                                 if (DateUtil.isCellDateFormatted(cell)) {
-                                    // Converte o valor numérico para uma data
                                     Date date = cell.getDateCellValue();
-                                    SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy"); // Formato de data
-                                    System.out.print(dateFormat.format(date) + "\t");
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                    System.out.print(dateFormat.format(date) + "; ");
                                 } else {
-                                    System.out.print(cell.getNumericCellValue() + "\t");
+                                    System.out.print(cell.getNumericCellValue() + "; ");
                                 }
                                 break;
                             case BOOLEAN:
-                                System.out.print(cell.getBooleanCellValue() + "\t");
+                                System.out.print(cell.getBooleanCellValue() + "; ");
+                                break;
+                            case BLANK:
+                                System.out.print("Blank; ");
+                                break;
+                            case ERROR:
+                                System.out.print("Error; ");
                                 break;
                             default:
-                                System.out.print("Unknown type\t");
+                                System.out.print("Unknown type");
                         }
+
                     }
                     System.out.println(); // Pula para a próxima linha
                 }
@@ -68,8 +90,9 @@ public class LeituraBucket {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            // Feche o cliente S3
-            s3.close();
+            if (s3 != null) {
+                s3.close();
+            }
         }
     }
 }
