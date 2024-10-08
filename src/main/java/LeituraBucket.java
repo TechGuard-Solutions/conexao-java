@@ -21,7 +21,7 @@ import java.util.List;
 
 public class LeituraBucket {
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent";
-    private static final String GEMINI_API_KEY = "AIzaSyCSasvsyA5oYwu1PTq1fVee3NtCDRZwgPo"; // Substitua pela sua chave de API
+    private static final String GEMINI_API_KEY = "AIzaSyCuTr7uy03HACLYqTwImB60FcTOQfSqbVg"; // Substitua pela sua chave de API
 
     public static String askGemini(List<String> questions) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
