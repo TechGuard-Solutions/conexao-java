@@ -21,53 +21,38 @@ import java.util.List;
 
 public class LeituraBucket {
     private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent";
-    private static final String GEMINI_API_KEY = "AIzaSyCuTr7uy03HACLYqTwImB60FcTOQfSqbVg"; // Substitua pela sua chave de API
+    private static final String GEMINI_API_KEY = "AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg"; // Substitua pela sua chave de API
 
-    public static String askGemini(List<String> questions) throws IOException, InterruptedException {
+    public static String askGemini(List<String> question) throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
-
-        // Construindo o JSON com segurança
-        StringBuilder jsonBody = new StringBuilder("{\"contents\":[");
-        for (String question : questions) {
-            String escapedQuestion = question.replace("\"", "\\\""); // Escapando aspas
-            jsonBody.append("{\"parts\":[{\"text\":\"").append(escapedQuestion).append("\"}]}").append(",");
-        }
-
-        // Remove a última vírgula e fecha o JSON
-        if (questions.size() > 0) {
-            jsonBody.setLength(jsonBody.length() - 1); // Remove última vírgula
-        }
-        jsonBody.append("]}");
-
-        // Construindo a requisição
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(GEMINI_API_URL + "?key=" + GEMINI_API_KEY))
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody.toString()))
+                .POST(HttpRequest.BodyPublishers.ofString("{\"contents\":[{\"parts\":[{\"text\":\"" + question + "\"}]}]}"))
                 .header("Content-Type", "application/json")
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        // Verificando o status da resposta
+        // Verifica o status da resposta
         if (response.statusCode() != 200) {
-            // Tratando erro 429 (Resource has been exhausted)
+            // Trata o erro 429 (Resource has been exhausted)
             if (response.statusCode() == 429) {
                 throw new IOException("Gemini API request failed: Resource has been exhausted (check quota).");
             }
-            throw new IOException("Gemini API request failed with status code: " + response.statusCode() + ". Response: " + response.body());
+            throw new IOException("Gemini API request failed with status code: " + response.statusCode());
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode root = objectMapper.readTree(response.body());
 
-        // Verificando se há candidatos na resposta
+        // Verifica se há candidatos na resposta
         if (root.path("candidates").isMissingNode() || root.path("candidates").isEmpty()) {
             throw new IOException("The 'candidates' field is missing or empty in the Gemini AI response.");
         }
 
         JsonNode answerNode = root.path("candidates").get(0).path("content").path("parts").get(0).path("text");
 
-        // Verificando se o texto da resposta está presente
+        // Verifica se o texto da resposta está presente
         if (answerNode.isMissingNode() || answerNode.asText().isEmpty()) {
             throw new IOException("The 'response.text' field is missing or empty in the Gemini AI response.");
         }
@@ -119,20 +104,49 @@ public class LeituraBucket {
                 }
 
                 // Envia todas as perguntas de uma só vez
-                if (!perguntas.isEmpty()) {
-                    List<String> respostas = Collections.singletonList(askGemini(perguntas));
+                List<String> respostas = new ArrayList<>();
+                for (String pergunta : perguntas) {
+                    respostas.add(askGemini(Collections.singletonList(pergunta)));
+                }
 
-                    // Armazena as respostas nas células correspondentes
-                    int respostaIndex = 0;
-                    for (int rowIndex = 0; rowIndex < sheet.getPhysicalNumberOfRows(); rowIndex++) {
-                        Row row = sheet.getRow(rowIndex);
-                        for (Cell cell : row) {
-                            if (cell.getColumnIndex() == 5 && respostaIndex < respostas.size()) {
-                                cell.setCellValue(respostas.get(respostaIndex));
-                                respostaIndex++;
-                            }
+                // Armazena as respostas nas células correspondentes
+                int respostaIndex = 0;
+                for (int rowIndex = 0; rowIndex < sheet.getPhysicalNumberOfRows(); rowIndex++) {
+                    Row row = sheet.getRow(rowIndex);
+                    for (Cell cell : row) {
+                        if (cell.getColumnIndex() == 5 && respostaIndex < respostas.size()) {
+                            cell.setCellValue(respostas.get(respostaIndex));
+                            respostaIndex++;
+                        }
+
+                        // Exibe os valores das células no console
+                        switch (cell.getCellType()) {
+                            case STRING:
+                                System.out.print(cell.getStringCellValue() + "; \t");
+                                break;
+                            case NUMERIC:
+                                if (DateUtil.isCellDateFormatted(cell)) {
+                                    Date date = cell.getDateCellValue();
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                    System.out.print(dateFormat.format(date) + "; ");
+                                } else {
+                                    System.out.print(cell.getNumericCellValue() + "; ");
+                                }
+                                break;
+                            case BOOLEAN:
+                                System.out.print(cell.getBooleanCellValue() + "; ");
+                                break;
+                            case BLANK:
+                                System.out.print("Blank; ");
+                                break;
+                            case ERROR:
+                                System.out.print("Error; ");
+                                break;
+                            default:
+                                System.out.print("Unknown type");
                         }
                     }
+                    System.out.println(); // Pula para a próxima linha
                 }
                 System.out.println(); // Adiciona uma linha em branco entre as folhas
             }
