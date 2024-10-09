@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,19 +33,20 @@ public class LeituraBucket {
                 .key(key)
                 .build();
 
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
         try (InputStream inputStream = s3.getObject(getObjectRequest);
              Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
 
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
-                System.out.println("Folha: " + sheet.getSheetName()); // Nome da folha
 
                 for (Row row : sheet) {
-                    Cell cell = row.getCell(5); // Pega a célula do índice 5
-                    if (cell != null && cell.getCellType() == CellType.STRING) {
-                        String term = cell.getStringCellValue();
+                    Cell celula5 = row.getCell(5); // Pega a célula do índice 5
+                    if (celula5 != null && celula5.getCellType() == CellType.STRING) {
+                        String term = row.getCell(5).getStringCellValue();
                         String category = classifyTermWithGemini(term);
-                        System.out.println("Term: " + term + " | Category: " + category);
+                        System.out.println(sdf.format(System.currentTimeMillis()) + " | " + term + " => " + category);
 
                     }
                 }
@@ -57,10 +59,6 @@ public class LeituraBucket {
                 s3.close();
             }
         }
-    }
-
-    private static void printResults(String term, String classification) {
-        System.out.println(term + " -> " + classification);
     }
 
     private static String classifyTermWithGemini(String term) {
@@ -101,16 +99,16 @@ public class LeituraBucket {
                     return parseClassification(response.toString());
 
                 } else if (responseCode == 429) { // Handling rate limiting
-                    System.out.println("Error: " + responseCode + " - Too Many Requests. Retrying...");
+//                    System.out.println("Error: " + responseCode + " - Too Many Requests. Retrying...");
                     Thread.sleep((long) Math.pow(2, attempts) * 1000); // Exponential backoff
                     attempts++;
                 } else {
-                    System.out.println("Error: " + responseCode + " - " + conn.getResponseMessage());
-                    break; // Exit loop for other errors
+//                    System.out.println("Error: " + responseCode + " - " + conn.getResponseMessage());
+                    break;
                 }
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
-                break; // Exit loop on exception
+                break;
             }
         }
         return "Classification failed"; // In case of an error
@@ -126,7 +124,6 @@ public class LeituraBucket {
         JSONObject content = candidate.getJSONObject("content");
         JSONArray parts = content.getJSONArray("parts");
         String classification = parts.getJSONObject(0).getString("text").trim();
-
-        return classification;
+        return classification; // <- variavel trocada ja pela IA
     }
 }
