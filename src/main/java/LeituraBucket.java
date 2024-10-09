@@ -4,69 +4,24 @@ import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 public class LeituraBucket {
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent";
-    private static final String GEMINI_API_KEY = "AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg"; // Substitua pela sua chave de API
-
-    public static String askGemini(List<String> question) throws IOException, InterruptedException {
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(GEMINI_API_URL + "?key=" + GEMINI_API_KEY))
-                .POST(HttpRequest.BodyPublishers.ofString("{\"contents\":[{\"parts\":[{\"text\":\"" + question + "\"}]}]}"))
-                .header("Content-Type", "application/json")
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // Verifica o status da resposta
-        if (response.statusCode() != 200) {
-            // Trata o erro 429 (Resource has been exhausted)
-            if (response.statusCode() == 429) {
-                throw new IOException("Gemini API request failed: Resource has been exhausted (check quota).");
-            }
-            throw new IOException("Gemini API request failed with status code: " + response.statusCode());
-        }
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode root = objectMapper.readTree(response.body());
-
-        // Verifica se há candidatos na resposta
-        if (root.path("candidates").isMissingNode() || root.path("candidates").isEmpty()) {
-            throw new IOException("The 'candidates' field is missing or empty in the Gemini AI response.");
-        }
-
-        JsonNode answerNode = root.path("candidates").get(0).path("content").path("parts").get(0).path("text");
-
-        // Verifica se o texto da resposta está presente
-        if (answerNode.isMissingNode() || answerNode.asText().isEmpty()) {
-            throw new IOException("The 'response.text' field is missing or empty in the Gemini AI response.");
-        }
-
-        return answerNode.asText(); // Retorna o texto da resposta
-    }
 
     public static void main(String[] args) {
-        List<String> perguntas = new ArrayList<>();
         String bucketName = "s3-sprint";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
-        // Criação do cliente S3
         S3Client s3 = S3Client.builder()
                 .region(region)
                 .credentialsProvider(ProfileCredentialsProvider.create())
@@ -78,86 +33,83 @@ public class LeituraBucket {
                 .build();
 
         try (InputStream inputStream = s3.getObject(getObjectRequest);
-             Workbook workbook = new XSSFWorkbook(inputStream)) {
+             Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
 
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
-                System.out.println("Folha: " + sheet.getSheetName());
+                System.out.println("Folha: " + sheet.getSheetName()); // Nome da folha
 
                 for (Row row : sheet) {
-                    for (Cell cell : row) {
-                        // Verifica se a coluna está dentro das permitidas
-                        if (cell.getColumnIndex() == 5) {
-                            String valorOriginal = cell.getStringCellValue();
-                            String pergunta = "Vou te passar 6 categorias e você me dirá em qual delas a palavra que eu te enviarei mais se aplica. " +
-                                    "1- Software e Aplicações\n" +
-                                    "2- Malware e Vulnerabilidades\n" +
-                                    "3- Frameworks e Bibliotecas\n" +
-                                    "4- Hardware e Firmware\n" +
-                                    "5- Protocolos e APIs\n" +
-                                    "6- Ferramentas de Desenvolvimento e Pacotes\n\n" +
-                                    "Em categoria a palavra '" + valorOriginal + "' se encaixa melhor? Responda apenas com o nome da categoria.";
+                    Cell cell = row.getCell(5); // Pega a célula do índice 5
+                    if (cell != null && cell.getCellType() == CellType.STRING) {
+                        String term = cell.getStringCellValue();
+                        String category = classifyTermWithGemini(term);
+                        System.out.println("Term: " + term + " | Category: " + category);
 
-                            perguntas.add(pergunta); // Adiciona a pergunta à lista
-                        }
                     }
-                }
-
-                // Envia todas as perguntas de uma só vez
-                List<String> respostas = new ArrayList<>();
-                for (String pergunta : perguntas) {
-                    respostas.add(askGemini(Collections.singletonList(pergunta)));
-                }
-
-                // Armazena as respostas nas células correspondentes
-                int respostaIndex = 0;
-                for (int rowIndex = 0; rowIndex < sheet.getPhysicalNumberOfRows(); rowIndex++) {
-                    Row row = sheet.getRow(rowIndex);
-                    for (Cell cell : row) {
-                        if (cell.getColumnIndex() == 5 && respostaIndex < respostas.size()) {
-                            cell.setCellValue(respostas.get(respostaIndex));
-                            respostaIndex++;
-                        }
-
-                        // Exibe os valores das células no console
-                        switch (cell.getCellType()) {
-                            case STRING:
-                                System.out.print(cell.getStringCellValue() + "; \t");
-                                break;
-                            case NUMERIC:
-                                if (DateUtil.isCellDateFormatted(cell)) {
-                                    Date date = cell.getDateCellValue();
-                                    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                                    System.out.print(dateFormat.format(date) + "; ");
-                                } else {
-                                    System.out.print(cell.getNumericCellValue() + "; ");
-                                }
-                                break;
-                            case BOOLEAN:
-                                System.out.print(cell.getBooleanCellValue() + "; ");
-                                break;
-                            case BLANK:
-                                System.out.print("Blank; ");
-                                break;
-                            case ERROR:
-                                System.out.print("Error; ");
-                                break;
-                            default:
-                                System.out.print("Unknown type");
-                        }
-                    }
-                    System.out.println(); // Pula para a próxima linha
                 }
                 System.out.println(); // Adiciona uma linha em branco entre as folhas
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         } finally {
             if (s3 != null) {
                 s3.close();
             }
         }
+    }
+
+    private static String classifyTermWithGemini(String term) {
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg"; // Update with your actual API key
+        String jsonInputString = String.format(
+                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories:\\n1. Software and Applications\\n2. Malware and Vulnerabilities\\n3. Frameworks and Libraries\\n4. Hardware and Firmware\\n5. Protocols and APIs\\n6. Development Tools and Packages\\nRespond with the category name only.\"}]}]}",
+                term
+        );
+
+        int attempts = 0;
+        while (attempts < 10) { // Maximum 5 attempts
+            try {
+                URL url = new URL(apiUrl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                // Send request
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+
+                // Check response code
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // Read response
+                    StringBuilder response = new StringBuilder();
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+                        String responseLine;
+                        while ((responseLine = br.readLine()) != null) {
+                            response.append(responseLine.trim());
+                        }
+                    }
+                    Thread.sleep(500); // Wait for 500 milliseconds between requests
+                    String classification = response.toString();
+                    System.out.println(term + " -> " + classification);
+                    return classification;
+                } else if (responseCode == 429) { // Handling rate limiting
+                    // Handle rate limiting
+                    System.out.println("Error: " + responseCode + " - Too Many Requests. Retrying...");
+                    Thread.sleep((long) Math.pow(2, attempts) * 1000); // Exponential backoff
+                    attempts++;
+                } else {
+                    System.out.println("Error: " + responseCode + " - " + conn.getResponseMessage());
+                    break; // Exit loop for other errors
+                }
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+                break; // Exit loop on exception
+            }
+        }
+        return "Classification failed"; // In case of an error
     }
 }
