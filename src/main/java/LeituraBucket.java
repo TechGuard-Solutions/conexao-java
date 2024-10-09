@@ -4,6 +4,8 @@ import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,8 +14,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class LeituraBucket {
 
@@ -59,6 +59,10 @@ public class LeituraBucket {
         }
     }
 
+    private static void printResults(String term, String classification) {
+        System.out.println(term + " -> " + classification);
+    }
+
     private static String classifyTermWithGemini(String term) {
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg"; // Update with your actual API key
         String jsonInputString = String.format(
@@ -92,12 +96,11 @@ public class LeituraBucket {
                             response.append(responseLine.trim());
                         }
                     }
-                    Thread.sleep(500); // Wait for 500 milliseconds between requests
-                    String classification = response.toString();
-                    System.out.println(term + " -> " + classification);
-                    return classification;
+
+                    // Parse the classification from the response
+                    return parseClassification(response.toString());
+
                 } else if (responseCode == 429) { // Handling rate limiting
-                    // Handle rate limiting
                     System.out.println("Error: " + responseCode + " - Too Many Requests. Retrying...");
                     Thread.sleep((long) Math.pow(2, attempts) * 1000); // Exponential backoff
                     attempts++;
@@ -111,5 +114,19 @@ public class LeituraBucket {
             }
         }
         return "Classification failed"; // In case of an error
+    }
+
+    // Method to parse the JSON response and extract the classification
+    private static String parseClassification(String jsonResponse) {
+        JSONObject jsonObject = new JSONObject(jsonResponse);
+        JSONArray candidatesArray = jsonObject.getJSONArray("candidates");
+
+        // Extract the "text" from the first candidate's content parts
+        JSONObject candidate = candidatesArray.getJSONObject(0);
+        JSONObject content = candidate.getJSONObject("content");
+        JSONArray parts = content.getJSONArray("parts");
+        String classification = parts.getJSONObject(0).getString("text").trim();
+
+        return classification;
     }
 }
