@@ -75,7 +75,7 @@ public class TratamentoImpacto {
     static String alterandoDados(String term) {
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg"; // Update with your actual API key
         String jsonInputString = String.format(
-                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories if the term is 'Impact' do not make any change:\\n1. Data Extraction\\n2. Remote Code Execution/Download\\n3. Backdoor Access\\n4. Data Damage\\n5. Payment Diversion\\n6. Miscellaneous\\nRespond with the category name only.\"}]}]}",
+                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term '%s' into one of the following categories: Data Extraction, Remote Code Execution, Backdoor Access, Data Damage, Payment Diversion, Others. Answer me only whith the name of classification.\"}]}]}",
                 term
         );
         int attempts = 0;
@@ -107,12 +107,12 @@ public class TratamentoImpacto {
                     listaModificadosImpact.add(classification);
                     return classification;
 
-                } else if (responseCode == 429) { // Handling rate limiting
-                    System.out.println("Error: " + responseCode + " - Too Many Requests. Retrying...");
-                    Thread.sleep((long) Math.pow(2, attempts) * 1000); // Exponential backoff
+                } else if (responseCode == 429) {
+//                    System.out.println("Error: " + responseCode + " - Too Many Requests. Retrying...");
+                    Thread.sleep((long) Math.pow(2, attempts) * 1000); // Aumento de tempo exponencial
                     attempts++;
                 } else {
-                    System.out.println("Error: " + responseCode + " - " + conn.getResponseMessage());
+//                    System.out.println("Error: " + responseCode + " - " + conn.getResponseMessage());
                     break;
                 }
             } catch (IOException | InterruptedException e) {
@@ -123,20 +123,44 @@ public class TratamentoImpacto {
         return "Classification failed"; // In case of an error
     }
 
-    // Method to parse the JSON response and extract the classification
     private static String extrairApenasMudanca(String jsonResponse) {
         JSONObject jsonObject = new JSONObject(jsonResponse);
+
         JSONArray candidatesArray = jsonObject.getJSONArray("candidates");
 
-        // Extract the "text" from the first candidate's content parts
-        JSONObject candidate = candidatesArray.getJSONObject(0);
-        JSONObject content = candidate.getJSONObject("content");
-        JSONArray parts = content.getJSONArray("parts");
-        String classification = parts.getJSONObject(0).getString("text").trim();
-        return classification; // <- variavel trocada ja pela IA
+        // Verifique se existem candidatos
+        if (candidatesArray.length() > 0) {
+            JSONObject candidate = candidatesArray.getJSONObject(0);
+
+            // Verificar se o "finishReason" é "STOP", indicando uma resposta completa
+            if (candidate.getString("finishReason").equals("STOP")) {
+                // Verificar se o campo "content" existe
+                if (candidate.has("content")) {
+                    JSONObject content = candidate.getJSONObject("content");
+                    JSONArray parts = content.getJSONArray("parts");
+
+                    // Verifique se "parts" contém elementos
+                    if (parts.length() > 0) {
+                        String classification = parts.getJSONObject(0).getString("text").trim();
+                        return classification; // Retorne a classificação
+                    } else {
+//                        System.out.println("Nenhuma parte encontrada no conteúdo.");
+                    }
+                } else {
+//                    System.out.println("Campo 'content' não encontrado no JSON.");
+                }
+            } else {
+                // Se o "finishReason" não for "STOP", trate de acordo
+//                System.out.println("Resposta bloqueada por motivos de segurança: " + candidate.getString("finishReason"));
+            }
+        } else {
+//            System.out.println("Nenhum candidato encontrado no JSON.");
+        }
+
+        return "Classification not found"; // Retorno em caso de falha
     }
 
-    public static void exibirMudancas() {
+    public static void exibirMudancasImpact() {
         for (String mudanca : listaModificadosImpact) {
             System.out.println(mudanca);
         }
