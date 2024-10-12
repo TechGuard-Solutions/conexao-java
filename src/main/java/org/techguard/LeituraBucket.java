@@ -1,5 +1,6 @@
 package org.techguard;
 
+import org.techguard.ErroNaLeituraBucket;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -12,8 +13,8 @@ import java.io.InputStream;
 
 public class LeituraBucket {
     public void lerBucket(){
-        String bucketName = "pedro1297";
-        String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
+        String bucketName = "s3-raw-lab11";
+        String key = "baseDeDadosBruto.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
         Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
 
         S3Client s3 = S3Client.builder()
@@ -59,9 +60,11 @@ public class LeituraBucket {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            ErroNaLeituraBucket falhaLeitura = new ErroNaLeituraBucket();
+            falhaLeitura.leituraNaoRealizada();
         } finally {
             // Feche o cliente S3
+            System.out.println("Operação de leitura do bucket finalizada!");
             s3.close();
         }
     }

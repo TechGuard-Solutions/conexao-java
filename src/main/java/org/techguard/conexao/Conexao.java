@@ -1,4 +1,6 @@
 package org.techguard.conexao;
+import org.techguard.conexao.ErroNaConexaoBanco;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -26,7 +28,13 @@ public class Conexao {
                 return conn;
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            ErroNaConexaoBanco falhaConexao = new ErroNaConexaoBanco();
+            falhaConexao.mostrarFalhaNaConexao();
+        } finally{
+            System.out.println("A operação de tentativa de conexão com o banco foi finalizada!");
         }
+        return null;
     }
+
+
 }
