@@ -298,7 +298,7 @@ public class LeituraBucket {
                                     } else {
                                         String term = cell.getStringCellValue();
                                         String category = alterandoDadosAffect(term);
-                                        System.out.print(listaModificadosAffect.get(listaModificadosAffect.size() - 1) + "\t");
+                                        System.out.print(listaModificadosAffect.get(cell.getRowIndex() - 1) + "\t");
                                     }
                                 } else if (cell.getColumnIndex() == 49) {
                                     if (cell.getRowIndex() == 0) {
@@ -306,7 +306,7 @@ public class LeituraBucket {
                                     } else {
                                         String term2 = cell.getStringCellValue();
                                         String category = alterandoDadosImpact(term2);
-                                        System.out.print(listaModificadosImpact.get(listaModificadosImpact.size() - 1) + "\t");
+                                        System.out.print(listaModificadosImpact.get(cell.getRowIndex() - 1) + "\t");
                                     }
                                 } else {
                                     System.out.print(cell.getStringCellValue() + "; \t");
