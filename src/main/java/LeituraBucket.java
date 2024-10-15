@@ -160,7 +160,7 @@ public class LeituraBucket {
                     // Parse the classificationAffect from the response
                     classificationAffect = extrairApenasMudancaAffect(response.toString());
                     listaModificadosAffect.add(classificationAffect);
-                    return classificationAffect;
+                    return classificationAffect; // <- inserir banco
 
                 } else if (responseCode == 429) {
                     Thread.sleep((long) Math.pow(2, attempts) * 1000);
@@ -173,7 +173,7 @@ public class LeituraBucket {
                 break;
             }
         }
-        return "Classification failed"; // In case of an error
+        return "Classification falhou"; // In case of an error
     }
 
     public static String alterandoDadosImpact(String term) {
@@ -210,7 +210,7 @@ public class LeituraBucket {
 
                     classificationImpact = extrairApenasMudancaImpact(response.toString());
                     listaModificadosImpact.add(classificationImpact);
-                    return classificationImpact;
+                    return classificationImpact; // <- inserir banco
 
                 } else if (responseCode == 429) {
                     Thread.sleep((long) Math.pow(2, tentativasImpact) * 1000); // Aumento de tempo exponencial
@@ -223,7 +223,7 @@ public class LeituraBucket {
                 break;
             }
         }
-        return "Classification failed"; // In case of an error
+        return "Classification falhou"; 
     }
 
     private static String extrairApenasMudancaAffect(String jsonResponse) {
@@ -238,10 +238,20 @@ public class LeituraBucket {
     private static String extrairApenasMudancaImpact(String jsonResponse) {
         JSONObject jsonObject = new JSONObject(jsonResponse);
         JSONArray candidatesArray = jsonObject.getJSONArray("candidates");
-        JSONObject candidate = candidatesArray.getJSONObject(0);
-        JSONObject content = candidate.getJSONObject("content");
-        JSONArray parts = content.getJSONArray("parts");
-        return parts.getJSONObject(0).getString("text").trim();
+        if (candidatesArray.length() > 0) {
+            JSONObject candidate = candidatesArray.getJSONObject(0);
+            if (candidate.getString("finishReason").equals("STOP")) {
+                if (candidate.has("content")) {
+                    JSONObject content = candidate.getJSONObject("content");
+                    JSONArray parts = content.getJSONArray("parts");
+                    if (parts.length() > 0) {
+                        String classification = parts.getJSONObject(0).getString("text").trim();
+                        return classification;
+                    }
+                }
+            }
+        }
+        return "Others";
     }
 
 
