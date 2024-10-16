@@ -126,7 +126,7 @@ public class LeituraBucket {
     public static String alterandoDadosAffect(String term) {
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg"; // Update with your actual API key
         String jsonInputString = String.format(
-                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories if the term is 'Affected Code' do not make any change:\\n1. Software and Applications\\n2. Malware and Vulnerabilities\\n3. Frameworks and Libraries\\n4. Hardware and Firmware\\n5. Protocols and APIs\\n6. Development Tools and Packages\\nRespond with the category name only.\"}]}]}",
+                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories:\n1. Software and Applications\n2. Malware and Vulnerabilities\n3. Frameworks and Libraries\n4. Hardware and Firmware\n5. Protocols and APIs\n6. Development Tools and Packages\nRespond with the category name only.\"}]}]}",
                 term
         );
 
@@ -179,7 +179,7 @@ public class LeituraBucket {
     public static String alterandoDadosImpact(String term) {
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg"; // Update with your actual API key
         String jsonInputString = String.format(
-                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term '%s' into one of the following categories: Data Extraction, Remote Code Execution, Backdoor Access, Data Damage, Payment Diversion, Others. Answer me only whith the name of classification.\"}]}]}",
+                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories:\n1. Data Extraction\n2. Remote Code Execution\n3. Backdoor Access\n4. Data Damage\n5. Payment Diversion\n6. Others\nRespond with the category name only.\"}]}]}",
                 term
         );
 
