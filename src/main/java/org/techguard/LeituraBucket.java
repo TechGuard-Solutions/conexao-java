@@ -1,3 +1,5 @@
+package org.techguard;
+
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -9,8 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class LeituraBucket {
-    public static void main(String[] args) {
-        String bucketName = "techguard-bucket";
+    public void lerBucket(){
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
         Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
 
@@ -64,3 +66,4 @@ public class LeituraBucket {
         }
     }
 }
+
