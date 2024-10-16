@@ -1,6 +1,5 @@
 package org.techguard;
 
-import org.techguard.ErroNaLeituraBucket;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
@@ -24,10 +23,46 @@ import java.util.List;
 import java.util.Date;
 
 public class LeituraBucket {
-    public static void main(String[] args) {
-        String bucketName = "s3-raw-lab11";
+
+    private static String classificationAffect;
+    private static String classificationImpact;
+    static List<String> listaModificadosAffect = new ArrayList<>();
+    static List<String> listaModificadosImpact = new ArrayList<>();
+
+    public void lerBucket() throws IOException {
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
         Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
+
+        S3Client s3 = S3Client.builder()
+                .region(region)
+                .credentialsProvider(ProfileCredentialsProvider.create())
+                .build();
+
+        // Construção de um novo objeto para solicitar o arquivo específico de um bucket no Amazon S3.
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        // Lendo o conteúdo do arquivo diretamente do S3
+        try (InputStream inputStream = s3.getObject(getObjectRequest);
+             Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
+
+            // Itera através de todas as folhas do workbook
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+                System.out.println("Folha: " + sheet.getSheetName()); // Nome da folha
+
+                s3.close();
+            }
+        }
+    }
+
+    public static void tratandoDadosAffect() {
+        String bucketName = "pedro1297";
+        String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
+        Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
         S3Client s3 = S3Client.builder()
                 .region(region)
@@ -47,14 +82,14 @@ public class LeituraBucket {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     if (row != null) {
                         Cell celula5 = row.getCell(5);
                         if (celula5 != null && celula5.getCellType() == CellType.STRING) {
                             String term = celula5.getStringCellValue();
                             String category = alterandoDadosAffect(term);
-                            System.out.println(sdf.format(System.currentTimeMillis()) + " | " + term + " => " + category);
+                            System.out.println(rowIndex + " - " + sdf.format(System.currentTimeMillis()) + " | " + term + " => " + category);
                         }
                     }
                 }
@@ -69,8 +104,10 @@ public class LeituraBucket {
         }
     }
 
+
+
     public static void tratandoDadosImpact() {
-        String bucketName = "s3-sprint";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx";
         Region region = Region.US_EAST_1;
 
@@ -92,14 +129,14 @@ public class LeituraBucket {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= sheet.getLastRowNum(); rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     if (row != null) {
                         Cell celula49 = row.getCell(49);
                         if (celula49 != null && celula49.getCellType() == CellType.STRING) {
                             String term = celula49.getStringCellValue();
                             String category = alterandoDadosImpact(term);
-                            System.out.println(sdf.format(System.currentTimeMillis()) + " | " + term + " => " + category);
+                            System.out.println(rowIndex + " - " + sdf.format(System.currentTimeMillis()) + " | " + term + " => " + category);
                         }
                     }
                 }
@@ -115,7 +152,7 @@ public class LeituraBucket {
     }
 
     public static String alterandoDadosAffect(String term) {
-        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg"; // Update with your actual API key
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA"; // Update with your actual API key
         String jsonInputString = String.format(
                 "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories:\n1. Software and Applications\n2. Malware and Vulnerabilities\n3. Frameworks and Libraries\n4. Hardware and Firmware\n5. Protocols and APIs\n6. Development Tools and Packages\nRespond with the category name only.\"}]}]}",
                 term
@@ -168,7 +205,7 @@ public class LeituraBucket {
     }
 
     public static String alterandoDadosImpact(String term) {
-        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg"; // Update with your actual API key
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA"; // Update with your actual API key
         String jsonInputString = String.format(
                 "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories:\n1. Data Extraction\n2. Remote Code Execution\n3. Backdoor Access\n4. Data Damage\n5. Payment Diversion\n6. Others\nRespond with the category name only.\"}]}]}",
                 term
@@ -214,7 +251,7 @@ public class LeituraBucket {
                 break;
             }
         }
-        return "Classification falhou"; 
+        return "Classification falhou";
     }
 
     private static String extrairApenasMudancaAffect(String jsonResponse) {
@@ -247,7 +284,7 @@ public class LeituraBucket {
 
 
     public static void mostrandoTabela() {
-        String bucketName = "s3-sprint";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx";
         Region region = Region.US_EAST_1;
 
@@ -269,7 +306,7 @@ public class LeituraBucket {
                 System.out.println("Folha: " + sheet.getSheetName());
 
                 for (Row row : sheet) {
-                    for (Cell cell : row) {
+                    for (Cell cell : row) { // Data, Nome, Ataque/Vazamento, Afetado, DownstreamTarget, Impacto
                         if (cell.getColumnIndex() != 0 && cell.getColumnIndex() != 1 &&
                                 cell.getColumnIndex() != 2 && cell.getColumnIndex() != 5 &&
                                 cell.getColumnIndex() != 7 && cell.getColumnIndex() != 49) {
@@ -289,7 +326,7 @@ public class LeituraBucket {
                                     } else {
                                         String term = cell.getStringCellValue();
                                         String category = alterandoDadosAffect(term);
-                                        System.out.print(listaModificadosAffect.get(cell.getRowIndex() - 1) + "\t");
+                                        System.out.print(listaModificadosAffect.get(cell.getRowIndex()) + "\t");
                                     }
                                 } else if (cell.getColumnIndex() == 49) {
                                     if (cell.getRowIndex() == 0) {
@@ -297,7 +334,7 @@ public class LeituraBucket {
                                     } else {
                                         String term2 = cell.getStringCellValue();
                                         String category = alterandoDadosImpact(term2);
-                                        System.out.print(listaModificadosImpact.get(cell.getRowIndex() - 1) + "\t");
+                                        System.out.print(listaModificadosImpact.get(cell.getRowIndex()) + "\t");
                                     }
                                 } else {
                                     System.out.print(cell.getStringCellValue() + "; \t");
@@ -330,12 +367,11 @@ public class LeituraBucket {
                 System.out.println();
             }
         } catch (IOException e) {
-            ErroNaLeituraBucket falhaLeitura = new ErroNaLeituraBucket();
-            falhaLeitura.leituraNaoRealizada();
+            e.printStackTrace();
         } finally {
-            // Feche o cliente S3
-            s3.close();
+            if (s3 != null) {
+                s3.close();
+            }
         }
     }
 }
-

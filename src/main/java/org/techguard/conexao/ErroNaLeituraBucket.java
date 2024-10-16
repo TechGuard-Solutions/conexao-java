@@ -1,4 +1,4 @@
-package org.techguard;
+package org.techguard.conexao;
 import java.io.IOException;
 
 public class ErroNaLeituraBucket extends IOException {

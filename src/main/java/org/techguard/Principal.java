@@ -3,11 +3,26 @@ package org.techguard;
 import org.techguard.dao.UsuarioDao;
 import org.techguard.tabelas.Usuario;
 
+import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
 
 
 public class Principal {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+
+        for (int i = 1; i <= 3; i++) {
+            if (i == 1){
+                System.out.println("impact");
+                LeituraBucket.tratandoDadosImpact();
+            } else if (i == 2){
+                System.out.println("affect");
+                LeituraBucket.tratandoDadosAffect();
+            } else if (i == 3) {
+                LeituraBucket.mostrandoTabela();
+            }
+        }
+
         LeituraBucket fazerLeituraBucket = new LeituraBucket();
         Scanner leitor = new Scanner(System.in);
         // Criação do objeto da classe usuario
