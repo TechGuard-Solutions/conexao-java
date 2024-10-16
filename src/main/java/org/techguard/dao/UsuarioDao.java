@@ -1,5 +1,8 @@
 package org.techguard.dao;
 
+import org.techguard.conexao.ErroNoInsert;
+import org.techguard.conexao.ErroNoSelect;
+
 import org.techguard.tabelas.Usuario;
 
 import java.sql.PreparedStatement;
@@ -10,6 +13,8 @@ import org.techguard.conexao.Conexao;
 
 public class UsuarioDao {
     // Metódo de insert de dados no banco
+
+    
     public void cadastrarUsuario(Usuario usuario) {
         // String que contém uma string do comando sql
         String sql = "INSERT INTO USUARIO (idUsuario, nomeUsuario, senhaUsuario, cpf, emailUsuario, telUsuario, fkEmpresa, fkTipoUsuario) VALUES (?, ? , ?, ?, ?, ?, ?, ?)";
@@ -38,7 +43,10 @@ public class UsuarioDao {
             ps.close();
             // Caso de um erro de exception sql, vai retornar um erro runtime com a exceção junto
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            ErroNoInsert novoErro = new ErroNoInsert(); // nova instância da exceção personalizada
+            novoErro.mostrarErro(); //MOSTRA A MENSAGEM DE ERRO PERSONALIZADA
+        } finally {
+            System.out.println("A operação de insert no banco foi finalizada!");
         }
     }
 
@@ -75,7 +83,11 @@ public class UsuarioDao {
             rs.close();
             ps.close();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+          ErroNoSelect selectErro = new ErroNoSelect();
+          selectErro.mostrarErroNoSelect();
+        }
+        finally {
+            System.out.println("A operação de select no banco foi finalizada!");
         }
     }
 }
