@@ -1,36 +1,33 @@
-package org.techguard;
+package org.techguard.tratativa;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.List;
-
 import java.util.Date;
+import java.util.List;
 
 public class LeituraBucket {
 
     private static String classificationAffect;
     private static String classificationImpact;
+    static List<String> listaDatas = new ArrayList<>();
+    static List<String> listaNomes = new ArrayList<>();
     static List<String> listaModificadosAffect = new ArrayList<>();
     static List<String> listaModificadosImpact = new ArrayList<>();
 
-    public void lerBucket() throws IOException {
-        String bucketName = "pedro1297";
+    public static void lerBucket() throws IOException {
+        String bucketName = "bucket-base-de-dados";
         String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
         Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
 
@@ -59,8 +56,101 @@ public class LeituraBucket {
         }
     }
 
+    public static void buscarDatasIncidentes() {
+        String bucketName = "bucket-base-de-dados";
+        String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
+        Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
+
+        S3Client s3 = S3Client.builder()
+                .region(region)
+                .credentialsProvider(ProfileCredentialsProvider.create())
+                .build();
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
+
+        try (InputStream inputStream = s3.getObject(getObjectRequest);
+             Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
+
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+
+                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                    Row row = sheet.getRow(rowIndex);
+
+                    if (row != null) {
+                        Cell celula0 = row.getCell(0);
+
+                        if (celula0 != null && celula0.getCellType() == CellType.NUMERIC) {
+                            Date term = celula0.getDateCellValue();
+                            String termFormatado = sdf.format(term);
+                            System.out.println(termFormatado);
+                            listaDatas.add(termFormatado);
+                        }
+                    }
+                }
+                System.out.println(); // Adiciona uma linha em branco entre as folhas
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (s3 != null) {
+                s3.close();
+            }
+        }
+    }
+
+    public static void buscarNomesIncidentes() {
+        String bucketName = "bucket-base-de-dados";
+        String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
+        Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
+
+        S3Client s3 = S3Client.builder()
+                .region(region)
+                .credentialsProvider(ProfileCredentialsProvider.create())
+                .build();
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        try (InputStream inputStream = s3.getObject(getObjectRequest);
+             Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
+
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+
+                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                    Row row = sheet.getRow(rowIndex);
+
+                    if (row != null) {
+                        Cell celula1 = row.getCell(1);
+
+                        if (celula1 != null && celula1.getCellType() == CellType.STRING) {
+                            String term = celula1.getStringCellValue();
+                            System.out.println(term);
+                            listaNomes.add(term);
+                        }
+                    }
+                }
+                System.out.println(); // Adiciona uma linha em branco entre as folhas
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (s3 != null) {
+                s3.close();
+            }
+        }
+    }
+
     public static void tratandoDadosAffect() {
-        String bucketName = "pedro1297";
+        String bucketName = "bucket-base-de-dados";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -107,7 +197,7 @@ public class LeituraBucket {
 
 
     public static void tratandoDadosImpact() {
-        String bucketName = "pedro1297";
+        String bucketName = "bucket-base-de-dados";
         String key = "basededados.xlsx";
         Region region = Region.US_EAST_1;
 
@@ -284,7 +374,7 @@ public class LeituraBucket {
 
 
     public static void mostrandoTabela() {
-        String bucketName = "pedro1297";
+        String bucketName = "bucket-base-de-dados";
         String key = "basededados.xlsx";
         Region region = Region.US_EAST_1;
 
