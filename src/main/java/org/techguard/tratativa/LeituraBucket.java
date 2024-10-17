@@ -23,6 +23,7 @@ public class LeituraBucket {
     private static String classificationImpact;
     static List<String> listaDatas = new ArrayList<>();
     static List<String> listaNomes = new ArrayList<>();
+    static List<String> listaAttackOuDisclosure = new ArrayList<>();
     static List<String> listaModificadosAffect = new ArrayList<>();
     static List<String> listaModificadosImpact = new ArrayList<>();
 
@@ -148,6 +149,53 @@ public class LeituraBucket {
             }
         }
     }
+
+    public static void buscarAttackOuDisclosure() {
+        String bucketName = "bucket-base-de-dados";
+        String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
+        Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
+
+        S3Client s3 = S3Client.builder()
+                .region(region)
+                .credentialsProvider(ProfileCredentialsProvider.create())
+                .build();
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        try (InputStream inputStream = s3.getObject(getObjectRequest);
+             Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
+
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+
+                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                    Row row = sheet.getRow(rowIndex);
+
+                    if (row != null) {
+                        Cell celula1 = row.getCell(2);
+
+                        if (celula1 != null && celula1.getCellType() == CellType.STRING) {
+                            String term = celula1.getStringCellValue();
+                            System.out.println(term);
+                            listaAttackOuDisclosure.add(term);
+                        }
+                    }
+                }
+                System.out.println(); // Adiciona uma linha em branco entre as folhas
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (s3 != null) {
+                s3.close();
+            }
+        }
+    }
+
+
 
     public static void tratandoDadosAffect() {
         String bucketName = "bucket-base-de-dados";

@@ -11,26 +11,30 @@ import java.util.Scanner;
 public class Principal {
     public static void main(String[] args) throws IOException {
 
-        for (int i = 1; i <= 4; i++) {
+//        for (int i = 1; i <= 4; i++) {
 
-            if(i == 1) {
-                System.out.println("Data");
-                LeituraBucket.buscarDatasIncidentes();
-            }
+//            if(i == 1) {
+//                System.out.println("Data");
+//                LeituraBucket.buscarDatasIncidentes();
+//            }
 //             else if(i == 2) {
 //                System.out.println("Nomes");
 //                LeituraBucket.buscarNomesIncidentes();
 //            }
-////            else if (i == 3){
+//            else if(i == 3) {
+                System.out.println("Attack/Disclosure");
+                LeituraBucket.buscarAttackOuDisclosure();
+//            }
+////            else if (i == 4){
 ////                System.out.println("impact");
 ////                LeituraBucket.tratandoDadosImpact();
-////            } else if (i == 4){
+////            } else if (i == 5){
 ////                System.out.println("affect");
 ////                LeituraBucket.tratandoDadosAffect();
-////            } else if (i == 5) {
+////            } else if (i == 6) {
 ////                LeituraBucket.mostrandoTabela();
 ////            }
-        }
+//        }
 
         LeituraBucket fazerLeituraBucket = new LeituraBucket();
         Scanner leitor = new Scanner(System.in);
