@@ -2,7 +2,7 @@ package org.techguard;
 
 import org.techguard.dao.UsuarioDao;
 import org.techguard.tabelas.Usuario;
-import org.techguard.tratativa.LeituraBucket;
+import org.techguard.tratativa.LeituraETratativa;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -11,32 +11,37 @@ import java.util.Scanner;
 public class Principal {
     public static void main(String[] args) throws IOException {
 
-//        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i <= 7; i++) {
 
-//            if(i == 1) {
-//                System.out.println("Data");
-//                LeituraBucket.buscarDatasIncidentes();
-//            }
-//             else if(i == 2) {
-//                System.out.println("Nomes");
-//                LeituraBucket.buscarNomesIncidentes();
-//            }
-//            else if(i == 3) {
+            if(i == 1) {
+                System.out.println("Data");
+                LeituraETratativa.buscarDatasIncidentes();
+            }
+             else if(i == 2) {
+                System.out.println("Nomes");
+                LeituraETratativa.buscarNomesIncidentes();
+            }
+            else if(i == 3) {
                 System.out.println("Attack/Disclosure");
-                LeituraBucket.buscarAttackOuDisclosure();
-//            }
-////            else if (i == 4){
-////                System.out.println("impact");
-////                LeituraBucket.tratandoDadosImpact();
-////            } else if (i == 5){
-////                System.out.println("affect");
-////                LeituraBucket.tratandoDadosAffect();
-////            } else if (i == 6) {
-////                LeituraBucket.mostrandoTabela();
-////            }
-//        }
+                LeituraETratativa.buscarAttackOuDisclosure();
+            }
+              else if(i == 4) {
+                System.out.println("Downstream Target");
+                LeituraETratativa.tratandoDadosDownstreamTarget();
+              }
+            else if (i == 5){
+                System.out.println("affect");
+                LeituraETratativa.tratandoDadosAffect();
 
-        LeituraBucket fazerLeituraBucket = new LeituraBucket();
+            } else if (i == 6){
+                System.out.println("impact");
+               LeituraETratativa.tratandoDadosImpact();
+            } else if (i == 7) {
+                LeituraETratativa.mostrandoTabela();
+            }
+        }
+
+        LeituraETratativa fazerLeituraETratativa = new LeituraETratativa();
         Scanner leitor = new Scanner(System.in);
         // Criação do objeto da classe usuario
         Usuario user = new Usuario();
@@ -102,7 +107,7 @@ public class Principal {
                             leitor.nextInt();
                     }
                 case 4:
-                    fazerLeituraBucket.lerBucket();
+                    fazerLeituraETratativa.lerBucket();
                     break;
                 case 0:
                     System.out.println("Saindo...");

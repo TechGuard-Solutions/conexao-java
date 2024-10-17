@@ -17,14 +17,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class LeituraBucket {
+public class LeituraETratativa {
 
     private static String classificationAffect;
+    private static String classificationDownstreamTarget;
     private static String classificationImpact;
     static List<String> listaDatas = new ArrayList<>();
     static List<String> listaNomes = new ArrayList<>();
     static List<String> listaAttackOuDisclosure = new ArrayList<>();
     static List<String> listaModificadosAffect = new ArrayList<>();
+    static List<String> listaModificadosDownstreamTarget = new ArrayList<>();
     static List<String> listaModificadosImpact = new ArrayList<>();
 
     public static void lerBucket() throws IOException {
@@ -90,7 +92,7 @@ public class LeituraBucket {
                             Date term = celula0.getDateCellValue();
                             String termFormatado = sdf.format(term);
                             System.out.println(termFormatado);
-                            listaDatas.add(termFormatado);
+                            listaDatas.add(rowIndex + " - " + termFormatado);
                         }
                     }
                 }
@@ -135,7 +137,7 @@ public class LeituraBucket {
                         if (celula1 != null && celula1.getCellType() == CellType.STRING) {
                             String term = celula1.getStringCellValue();
                             System.out.println(term);
-                            listaNomes.add(term);
+                            listaNomes.add(rowIndex + " - " + term);
                         }
                     }
                 }
@@ -175,12 +177,12 @@ public class LeituraBucket {
                     Row row = sheet.getRow(rowIndex);
 
                     if (row != null) {
-                        Cell celula1 = row.getCell(2);
+                        Cell celula2 = row.getCell(2);
 
-                        if (celula1 != null && celula1.getCellType() == CellType.STRING) {
-                            String term = celula1.getStringCellValue();
+                        if (celula2 != null && celula2.getCellType() == CellType.STRING) {
+                            String term = celula2.getStringCellValue();
                             System.out.println(term);
-                            listaAttackOuDisclosure.add(term);
+                            listaAttackOuDisclosure.add(rowIndex + " - " + term);
                         }
                     }
                 }
@@ -242,7 +244,50 @@ public class LeituraBucket {
         }
     }
 
+    public static void tratandoDadosDownstreamTarget() {
+        String bucketName = "bucket-base-de-dados";
+        String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
+        Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
+        S3Client s3 = S3Client.builder()
+                .region(region)
+                .credentialsProvider(ProfileCredentialsProvider.create())
+                .build();
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
+        try (InputStream inputStream = s3.getObject(getObjectRequest);
+             Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
+
+            for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+                Sheet sheet = workbook.getSheetAt(i);
+
+                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                    Row row = sheet.getRow(rowIndex);
+                    if (row != null) {
+                        Cell celula7 = row.getCell(7);
+                        if (celula7 != null && celula7.getCellType() == CellType.STRING) {
+                            String term = celula7.getStringCellValue();
+                            String category = alterandoDadosDownstreamTarget(term);
+                            System.out.println(rowIndex + " - " + sdf.format(System.currentTimeMillis()) + " | " + term + " => " + category);
+                        }
+                    }
+                }
+                System.out.println(); // Adiciona uma linha em branco entre as folhas
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (s3 != null) {
+                s3.close();
+            }
+        }
+    }
 
     public static void tratandoDadosImpact() {
         String bucketName = "bucket-base-de-dados";
@@ -342,6 +387,59 @@ public class LeituraBucket {
         return "Classification falhou"; // In case of an error
     }
 
+    public static String alterandoDadosDownstreamTarget(String term) {
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA"; // Update with your actual API key
+        String jsonInputString = String.format(
+                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories:\n1. Systems and Platform Users\n2. Software Applications and Libraries\n3. Empresas e Organizações\n4. Cryptocurrency and Finance Users\n5. Governments, Activists and Non-Governmental Organizations (NGOs)\n6. Developers and IT Professionals\nRespond with the category name only.\"}]}]}",
+                term
+        );
+
+        Integer attempts = 0;
+        while (attempts < 10) { // Maximum 5 attempts
+            try {
+                URL url = new URL(apiUrl);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                // Send request
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+
+                // Check response code
+                int responseCode = conn.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
+                    // Read response
+                    StringBuilder response = new StringBuilder();
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+                        String responseLine;
+                        while ((responseLine = br.readLine()) != null) {
+                            response.append(responseLine.trim());
+                        }
+                    }
+
+                    // Parse the classificationAffect from the response
+                    classificationDownstreamTarget = extrairApenasMudancaDownstreamTarget(response.toString());
+                    listaModificadosDownstreamTarget.add(classificationDownstreamTarget);
+                    return classificationDownstreamTarget; // <- inserir banco
+
+                } else if (responseCode == 429) {
+                    Thread.sleep((long) Math.pow(2, attempts) * 1000);
+                    attempts++;
+                } else {
+                    break;
+                }
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+                break;
+            }
+        }
+        return "Classification falhou"; // In case of an error
+    }
+
     public static String alterandoDadosImpact(String term) {
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA"; // Update with your actual API key
         String jsonInputString = String.format(
@@ -401,6 +499,15 @@ public class LeituraBucket {
         return parts.getJSONObject(0).getString("text").trim();
     }
 
+    private static String extrairApenasMudancaDownstreamTarget(String jsonResponse) {
+        JSONObject jsonObject = new JSONObject(jsonResponse);
+        JSONArray candidatesArray = jsonObject.getJSONArray("candidates");
+        JSONObject candidate = candidatesArray.getJSONObject(0);
+        JSONObject content = candidate.getJSONObject("content");
+        JSONArray parts = content.getJSONArray("parts");
+        return parts.getJSONObject(0).getString("text").trim();
+    }
+
     private static String extrairApenasMudancaImpact(String jsonResponse) {
         JSONObject jsonObject = new JSONObject(jsonResponse);
         JSONArray candidatesArray = jsonObject.getJSONArray("candidates");
@@ -444,7 +551,7 @@ public class LeituraBucket {
                 System.out.println("Folha: " + sheet.getSheetName());
 
                 for (Row row : sheet) {
-                    for (Cell cell : row) { // Data, Nome, Ataque/Vazamento, Afetado, DownstreamTarget, Impacto
+                    for (Cell cell : row) { // Data, Nome, Ataque/Vazamento, Afetado, Alvo Subsequente(Secundário), Impacto
                         if (cell.getColumnIndex() != 0 && cell.getColumnIndex() != 1 &&
                                 cell.getColumnIndex() != 2 && cell.getColumnIndex() != 5 &&
                                 cell.getColumnIndex() != 7 && cell.getColumnIndex() != 49) {
