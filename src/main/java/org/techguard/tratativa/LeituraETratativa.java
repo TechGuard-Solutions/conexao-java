@@ -18,19 +18,18 @@ import java.util.Date;
 import java.util.List;
 
 public class LeituraETratativa {
-
     private static String classificationAffect;
     private static String classificationDownstreamTarget;
     private static String classificationImpact;
-    static List<String> listaDatas = new ArrayList<>();
-    static List<String> listaNomes = new ArrayList<>();
-    static List<String> listaAttackOuDisclosure = new ArrayList<>();
-    static List<String> listaModificadosAffect = new ArrayList<>();
-    static List<String> listaModificadosDownstreamTarget = new ArrayList<>();
-    static List<String> listaModificadosImpact = new ArrayList<>();
+    public static List<String> listaDatas = new ArrayList<>();
+    public static List<String> listaNomes = new ArrayList<>();
+    public static List<String> listaAttackOuDisclosure = new ArrayList<>();
+    public static List<String> listaModificadosAffect = new ArrayList<>();
+    public static List<String> listaModificadosDownstreamTarget = new ArrayList<>();
+    public static List<String> listaModificadosImpact = new ArrayList<>();
 
     public static void lerBucket() throws IOException {
-        String bucketName = "bucket-base-de-dados";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
         Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
 
@@ -60,7 +59,7 @@ public class LeituraETratativa {
     }
 
     public static void buscarDatasIncidentes() {
-        String bucketName = "bucket-base-de-dados";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -74,7 +73,7 @@ public class LeituraETratativa {
                 .key(key)
                 .build();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yy");
+        SimpleDateFormat sdf = new SimpleDateFormat("yy/MM/dd");
 
         try (InputStream inputStream = s3.getObject(getObjectRequest);
              Workbook workbook = new XSSFWorkbook(inputStream)) { // Usando Apache POI para ler o arquivo XLSX
@@ -82,7 +81,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
 
                     if (row != null) {
@@ -92,7 +91,7 @@ public class LeituraETratativa {
                             Date term = celula0.getDateCellValue();
                             String termFormatado = sdf.format(term);
                             System.out.println(termFormatado);
-                            listaDatas.add(rowIndex + " - " + termFormatado);
+                            listaDatas.add(termFormatado);
                         }
                     }
                 }
@@ -108,7 +107,7 @@ public class LeituraETratativa {
     }
 
     public static void buscarNomesIncidentes() {
-        String bucketName = "bucket-base-de-dados";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -128,7 +127,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
 
                     if (row != null) {
@@ -137,7 +136,7 @@ public class LeituraETratativa {
                         if (celula1 != null && celula1.getCellType() == CellType.STRING) {
                             String term = celula1.getStringCellValue();
                             System.out.println(term);
-                            listaNomes.add(rowIndex + " - " + term);
+                            listaNomes.add(term);
                         }
                     }
                 }
@@ -153,7 +152,7 @@ public class LeituraETratativa {
     }
 
     public static void buscarAttackOuDisclosure() {
-        String bucketName = "bucket-base-de-dados";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -173,7 +172,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
 
                     if (row != null) {
@@ -182,7 +181,7 @@ public class LeituraETratativa {
                         if (celula2 != null && celula2.getCellType() == CellType.STRING) {
                             String term = celula2.getStringCellValue();
                             System.out.println(term);
-                            listaAttackOuDisclosure.add(rowIndex + " - " + term);
+                            listaAttackOuDisclosure.add(term);
                         }
                     }
                 }
@@ -200,7 +199,7 @@ public class LeituraETratativa {
 
 
     public static void tratandoDadosAffect() {
-        String bucketName = "bucket-base-de-dados";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -222,7 +221,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     if (row != null) {
                         Cell celula5 = row.getCell(5);
@@ -245,7 +244,7 @@ public class LeituraETratativa {
     }
 
     public static void tratandoDadosDownstreamTarget() {
-        String bucketName = "bucket-base-de-dados";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -267,7 +266,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     if (row != null) {
                         Cell celula7 = row.getCell(7);
@@ -290,7 +289,7 @@ public class LeituraETratativa {
     }
 
     public static void tratandoDadosImpact() {
-        String bucketName = "bucket-base-de-dados";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx";
         Region region = Region.US_EAST_1;
 
@@ -312,7 +311,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 75; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     if (row != null) {
                         Cell celula49 = row.getCell(49);
@@ -529,7 +528,7 @@ public class LeituraETratativa {
 
 
     public static void mostrandoTabela() {
-        String bucketName = "bucket-base-de-dados";
+        String bucketName = "pedro1297";
         String key = "basededados.xlsx";
         Region region = Region.US_EAST_1;
 
