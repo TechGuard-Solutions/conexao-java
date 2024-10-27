@@ -28,6 +28,7 @@ public class LeituraETratativa {
     public static List<String> listaModificadosDownstreamTarget = new ArrayList<>();
     public static List<String> listaModificadosImpact = new ArrayList<>();
 
+
     public static void lerBucket() throws IOException {
         String bucketName = "techguard-bucket";
         String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
@@ -59,7 +60,7 @@ public class LeituraETratativa {
     }
 
     public static void buscarDatasIncidentes() {
-        String bucketName = "pedro1297";
+        String bucketName = "techguard-bucket";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -107,7 +108,7 @@ public class LeituraETratativa {
     }
 
     public static void buscarNomesIncidentes() {
-        String bucketName = "pedro1297";
+        String bucketName = "techguard-bucket";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -152,7 +153,7 @@ public class LeituraETratativa {
     }
 
     public static void buscarAttackOuDisclosure() {
-        String bucketName = "pedro1297";
+        String bucketName = "techguard-bucket";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -199,7 +200,7 @@ public class LeituraETratativa {
 
 
     public static void tratandoDadosAffect() {
-        String bucketName = "pedro1297";
+        String bucketName = "techguard-bucket";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -244,7 +245,7 @@ public class LeituraETratativa {
     }
 
     public static void tratandoDadosDownstreamTarget() {
-        String bucketName = "pedro1297";
+        String bucketName = "techguard-bucket";
         String key = "basededados.xlsx"; // Altere para a chave do seu arquivo no bucket
         Region region = Region.US_EAST_1; // Substitua pela região do seu bucket
 
@@ -289,7 +290,7 @@ public class LeituraETratativa {
     }
 
     public static void tratandoDadosImpact() {
-        String bucketName = "pedro1297";
+        String bucketName = "techguard-bucket";
         String key = "basededados.xlsx";
         Region region = Region.US_EAST_1;
 
@@ -528,7 +529,7 @@ public class LeituraETratativa {
 
 
     public static void mostrandoTabela() {
-        String bucketName = "pedro1297";
+        String bucketName = "techguard-bucket";
         String key = "basededados.xlsx";
         Region region = Region.US_EAST_1;
 
