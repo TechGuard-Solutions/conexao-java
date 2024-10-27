@@ -29,7 +29,7 @@ public class LeituraETratativa {
     public static List<String> listaModificadosImpact = new ArrayList<>();
 
     public static void lerBucket() throws IOException {
-        String bucketName = "pedro1297";
+        String bucketName = "techguard-bucket";
         String key = "basededados.xlsx"; // Altere para a chave(nome do seu arquivo no bucket) do seu arquivo
         Region region = Region.US_EAST_1; // Substitua pela sua região do bucket
 
