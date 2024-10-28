@@ -10,7 +10,7 @@ public class Conexao {
     // Classes privadas, estáticas e "final" são classes que são usadas como cópia em outra classe
     // (sendo que todas precisam da conexão) e são imutáveis
     // Classes de url do banco, nome e senha do usuário
-    private static final String url = "jdbc:mysql://localhost:3306/techguard";
+    private static final String url = "jdbc:mysql://TechGuardDB/techguard";
     private static final String user = "root";
     private static final String password = "solutions";
 
