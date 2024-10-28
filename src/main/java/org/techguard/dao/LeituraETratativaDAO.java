@@ -35,7 +35,7 @@ public class LeituraETratativaDAO {
 
             // Executando o insert e fechando o prepared statement
             ps.execute();
-//            ps.close();
+            ps.close();
             // Caso de um erro de exception sql, vai retornar um erro runtime com a exceção junto
         } catch (SQLException e){
             throw new RuntimeException(e);

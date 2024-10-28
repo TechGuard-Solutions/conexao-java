@@ -4,10 +4,12 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.techguard.conexao.ErroNaLeituraBucket;
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -55,6 +57,8 @@ public class LeituraETratativa {
 
                 s3.close();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -97,8 +101,8 @@ public class LeituraETratativa {
                 }
                 System.out.println(); // Adiciona uma linha em branco entre as folhas
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (S3Exception | IOException e) {
+            System.out.println("Erro na leitura do bucket: " + e.getMessage());;
         } finally {
             if (s3 != null) {
                 s3.close();
@@ -142,8 +146,8 @@ public class LeituraETratativa {
                 }
                 System.out.println(); // Adiciona uma linha em branco entre as folhas
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (S3Exception | IOException e) {
+            System.out.println("Erro na leitura do bucket: " + e.getMessage());;
         } finally {
             if (s3 != null) {
                 s3.close();
@@ -187,8 +191,8 @@ public class LeituraETratativa {
                 }
                 System.out.println(); // Adiciona uma linha em branco entre as folhas
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (S3Exception | IOException e) {
+            System.out.println("Erro na leitura do bucket: " + e.getMessage());;
         } finally {
             if (s3 != null) {
                 s3.close();
@@ -234,8 +238,8 @@ public class LeituraETratativa {
                 }
                 System.out.println(); // Adiciona uma linha em branco entre as folhas
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (S3Exception | IOException e) {
+            System.out.println("Erro na leitura do bucket: " + e.getMessage());;
         } finally {
             if (s3 != null) {
                 s3.close();
@@ -279,9 +283,9 @@ public class LeituraETratativa {
                 }
                 System.out.println(); // Adiciona uma linha em branco entre as folhas
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+        } catch (S3Exception | IOException e) {
+            System.out.println("Erro na leitura do bucket: " + e.getMessage());;
+        }finally {
             if (s3 != null) {
                 s3.close();
             }
@@ -324,8 +328,8 @@ public class LeituraETratativa {
                 }
                 System.out.println();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (S3Exception | IOException e) {
+            System.out.println("Erro na leitura do bucket: " + e.getMessage());;
         } finally {
             if (s3 != null) {
                 s3.close();
@@ -610,8 +614,8 @@ public class LeituraETratativa {
                 }
                 System.out.println();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        }  catch (S3Exception | IOException e) {
+            System.out.println("Erro na leitura do bucket: " + e.getMessage());;
         } finally {
             if (s3 != null) {
                 s3.close();
