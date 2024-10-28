@@ -12,7 +12,7 @@ public class Conexao {
     // Classes de url do banco, nome e senha do usuário
     private static final String url = "jdbc:mysql://localhost:3306/techguard";
     private static final String user = "root";
-    private static final String password = "16012004";
+    private static final String password = "solutions";
 
     // Objeto de conexão
     public static Connection conn;
