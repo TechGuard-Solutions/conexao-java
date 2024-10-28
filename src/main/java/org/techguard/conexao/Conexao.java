@@ -31,7 +31,7 @@ public class Conexao {
             ErroNaConexaoBanco falhaConexao = new ErroNaConexaoBanco();
             falhaConexao.mostrarFalhaNaConexao();
         } finally{
-            System.out.println("A operação de tentativa de conexão com o banco foi finalizada!");
+            System.out.println("A operacao de tentativa de conexão com o banco foi finalizada!");
         }
         return null;
     }
