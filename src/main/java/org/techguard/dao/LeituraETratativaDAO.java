@@ -23,7 +23,7 @@ public class LeituraETratativaDAO {
         try {
 
             ps = Conexao.getConexao().prepareStatement(sql);
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 50; i++) {
                 ps.setString(1, listaDatas.get(i));
                 ps.setString(2, listaNomes.get(i));
                 ps.setString(3, listaAttackOuDisclosure.get(i));

@@ -85,7 +85,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 50; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
 
                     if (row != null) {
@@ -131,7 +131,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 50; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
 
                     if (row != null) {
@@ -176,7 +176,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 50; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
 
                     if (row != null) {
@@ -225,7 +225,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 50; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     if (row != null) {
                         Cell celula5 = row.getCell(5);
@@ -270,7 +270,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 50; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     if (row != null) {
                         Cell celula7 = row.getCell(7);
@@ -315,7 +315,7 @@ public class LeituraETratativa {
             for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                 Sheet sheet = workbook.getSheetAt(i);
 
-                for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
+                for (int rowIndex = 1; rowIndex <= 50; rowIndex++) {
                     Row row = sheet.getRow(rowIndex);
                     if (row != null) {
                         Cell celula49 = row.getCell(49);
