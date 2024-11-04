@@ -342,7 +342,7 @@ public class LeituraETratativa {
         );
 
         Integer attempts = 0;
-        while (attempts < 10) { // Maximum 5 attempts
+        while (attempts < 10) {
             try {
                 URL url = new URL(apiUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -390,12 +390,12 @@ public class LeituraETratativa {
     public static String alterandoDadosDownstreamTarget(String term) {
         String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA"; // Update with your actual API key
         String jsonInputString = String.format(
-                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories:\n1. Systems and Platform Users\n2. Software Applications and Libraries\n3. companies and organizations\n4. Cryptocurrency and Finance Users\n5. Governments, Activists and Non-Governmental Organizations (NGOs)\n6. Developers and IT Professionals\nRespond with the category name only(without numbers or special characters).\"}]}]}",
+                "{\"contents\":[{\"parts\":[{\"text\":\"Classify the term: '%s' into one of the following categories:\n1. Systems and Platform Users\n2. Software Applications and Libraries\n3. Companies and organizations\n4. Cryptocurrency and Finance Users\n5. Governments, Activists and Non-Governmental Organizations (NGOs)\n6. Developers and IT Professionals\nRespond with the category name only(without numbers or special characters).\"}]}]}",
                 term
         );
 
         Integer attempts = 0;
-        while (attempts < 10) { // Maximum 5 attempts
+        while (attempts < 10) {
             try {
                 URL url = new URL(apiUrl);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
