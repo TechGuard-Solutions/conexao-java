@@ -1,44 +1,33 @@
 package org.techguard;
 
+import org.techguard.api.ClassificadorAPI;
+import org.techguard.conexao.S3Connection;
 import org.techguard.dao.LeituraETratativaDAO;
-import org.techguard.dao.UsuarioDao;
-import org.techguard.tabelas.Usuario;
-import org.techguard.tratativa.LeituraETratativa;
+import org.techguard.modelo.Incidente;
+import org.techguard.tratativa.ProcessadorDados;
+import software.amazon.awssdk.regions.Region;
 
 import java.io.IOException;
-import java.util.Scanner;
+import java.util.List;
 
 public class Principal {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
+        String bucketName = "techguard-bucket";
+        String key = "basededados.xlsx";
+        String apiKey = "AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA";
+        Region region = Region.US_EAST_1;
 
-        LeituraETratativaDAO leituraETratativaDAO = new LeituraETratativaDAO();
+        try (S3Connection s3Connection = new S3Connection(bucketName, key, region)) {
+            ClassificadorAPI classificadorAPI = new ClassificadorAPI(apiKey);
+            ProcessadorDados processador = new ProcessadorDados(s3Connection, classificadorAPI);
 
-        for (int i = 1; i <= 7; i++) {
-            if (i == 1) {
-                System.out.println("Data");
-                LeituraETratativa.buscarDatasIncidentes();
-            } else if (i == 2) {
-                System.out.println("Nomes");
-                LeituraETratativa.buscarNomesIncidentes();
-            } else if (i == 3) {
-                System.out.println("Attack/Disclosure");
-                LeituraETratativa.buscarAttackOuDisclosure();
-            } else if (i == 4) {
-                System.out.println("Downstream Target");
-                LeituraETratativa.tratandoDadosDownstreamTarget();
-            } else if (i == 5) {
-                System.out.println("affect");
-                LeituraETratativa.tratandoDadosAffect();
+            List<Incidente> incidentes = processador.processar();
 
-            } else if (i == 6) {
-                System.out.println("impact");
-                LeituraETratativa.tratandoDadosImpact();
-            } else if (i == 7) {
-//                LeituraETratativa.mostrandoTabela();
-            }
+            LeituraETratativaDAO dao = new LeituraETratativaDAO();
+            dao.cadastrarDados(incidentes);
+
+        } catch (IOException e) {
+            System.err.println("Erro ao processar dados: " + e.getMessage());
         }
-
-        LeituraETratativa fazerLeituraETratativa = new LeituraETratativa();
-        leituraETratativaDAO.cadastrarDados(fazerLeituraETratativa);
     }
 }
