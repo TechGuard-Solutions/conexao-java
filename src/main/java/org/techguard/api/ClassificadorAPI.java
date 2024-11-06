@@ -9,17 +9,22 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ClassificadorAPI {
+    private static final Logger LOGGER = LogManager.getLogger(ClassificadorAPI.class);
+
     private String apiKey;
 
     public ClassificadorAPI(String apiKey) {
         this.apiKey = apiKey;
     }
     public String classificar(String termo, String categoria) throws IOException, InterruptedException {
-        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=" + apiKey;
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA";
         String prompt = gerarPrompt(termo, categoria);
         String jsonInputString = String.format("{\"contents\":[{\"parts\":[{\"text\":\"%s\"}]}]}", prompt);
+        LOGGER.info("Chamando API para classificar termo '{}' na categoria '{}'. URL: {}", termo, categoria, apiUrl);
 
         int tentativas = 0;
         while (tentativas < 10) {
@@ -45,12 +50,16 @@ public class ClassificadorAPI {
                         }
                     }
 
+                    LOGGER.debug("Resposta completa da API: {}", response.toString()); // Log da resposta completa
                     return extrairClassificacao(response.toString());
 
-                } else if (responseCode == 429) { // Too Many Requests
+                } else if (responseCode == 429) {
+                    LOGGER.warn("API retornou 'Too Many Requests'. Tentando novamente em {} segundos...", (long) Math.pow(2, tentativas));// Too Many Requests
                     Thread.sleep((long) Math.pow(2, tentativas) * 1000); // Backoff exponencial
                     tentativas++;
                 } else {
+                    String mensagemErro = String.format("Erro na chamada da API. Código de resposta: %d, Termo: %s, Categoria: %s", responseCode, termo, categoria);
+                    LOGGER.error(mensagemErro);
                     throw new IOException("Erro na chamada da API: " + responseCode);
                 }
             } catch (IOException e) {
@@ -62,6 +71,7 @@ public class ClassificadorAPI {
                 throw new IOException("Excedeu o número máximo de tentativas. Erro original: " + e.getMessage(), e);
             }
         }
+        LOGGER.error("Falha ao classificar termo '{}' na categoria '{}' após {} tentativas.", termo, categoria, tentativas);
         return "Classification falhou"; // ou lance uma exceção
     }
 
@@ -82,18 +92,18 @@ public class ClassificadorAPI {
     private String extrairClassificacao(String jsonResponse) {
         JSONObject jsonObject = new JSONObject(jsonResponse);
         JSONArray candidatesArray = jsonObject.getJSONArray("candidates");
-        if (candidatesArray.isEmpty()) {
-            return "Classificação não encontrada"; // Ou lance uma exceção
+        if (candidatesArray.length() > 0) {
+            JSONObject candidate = candidatesArray.getJSONObject(0);
+            if (candidate.getString("finishReason").equals("STOP")) {
+                if (candidate.has("content")) {
+                    JSONObject content = candidate.getJSONObject("content");
+                    JSONArray parts = content.getJSONArray("parts");
+                    if (parts.length() > 0) {
+                        return parts.getJSONObject(0).getString("text").trim();
+                    }
+                }
+            }
         }
-        JSONObject candidate = candidatesArray.getJSONObject(0);
-        JSONObject content = candidate.getJSONObject("content");
-        JSONArray parts = content.getJSONArray("parts");
-        if (parts.isEmpty()) {
-            return "Classificação não encontrada"; // Ou lance uma exceção
-        }
-
-
-        return parts.getJSONObject(0).getString("text").trim();
-
+        return "Others";
     }
 }

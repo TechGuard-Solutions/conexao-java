@@ -8,8 +8,11 @@ import org.techguard.modelo.Incidente;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class TratadorDadosClassificacao extends TratadorDados {
+    private static final Logger LOGGER = LogManager.getLogger(TratadorDadosClassificacao.class);
 
     private static final int COLUNA_AFFECT = 5;
     private static final int COLUNA_DOWNSTREAM = 7;
@@ -27,6 +30,7 @@ public class TratadorDadosClassificacao extends TratadorDados {
 
     @Override
     public List<Incidente> processarDados(Workbook workbook, List<Incidente> incidentes) throws IOException {
+        LOGGER.info("Iniciando classificação dos dados.");
 
         if (incidentes == null || incidentes.isEmpty()) {
             return incidentes;
@@ -48,6 +52,7 @@ public class TratadorDadosClassificacao extends TratadorDados {
                 Incidente incidente = incidentes.get(rowIndex - 1);
 
                 try {
+                    LOGGER.debug("Classificando incidente na linha {}", rowIndex);
                     classificarCampo(row, incidente, COLUNA_AFFECT, "Affect");
                     classificarCampo(row, incidente, COLUNA_DOWNSTREAM, "Downstream Target");
                     classificarCampo(row, incidente, COLUNA_IMPACT, "Impact");

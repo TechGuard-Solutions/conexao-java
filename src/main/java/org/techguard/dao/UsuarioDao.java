@@ -1,5 +1,6 @@
 package org.techguard.dao;
 
+import org.techguard.conexao.ErroNaConexaoBanco;
 import org.techguard.conexao.ErroNoInsert;
 import org.techguard.conexao.ErroNoSelect;
 
@@ -42,7 +43,7 @@ public class UsuarioDao {
             ps.execute();
             ps.close();
             // Caso de um erro de exception sql, vai retornar um erro runtime com a exceção junto
-        } catch (SQLException e) {
+        } catch (SQLException | ErroNaConexaoBanco e) {
             ErroNoInsert novoErro = new ErroNoInsert(); // nova instância da exceção personalizada
             novoErro.mostrarErro(); //MOSTRA A MENSAGEM DE ERRO PERSONALIZADA
         } finally {
@@ -85,8 +86,9 @@ public class UsuarioDao {
         } catch (SQLException e) {
           ErroNoSelect selectErro = new ErroNoSelect();
           selectErro.mostrarErroNoSelect();
-        }
-        finally {
+        } catch (ErroNaConexaoBanco e) {
+            throw new RuntimeException(e);
+        } finally {
             System.out.println("A operação de select no banco foi finalizada!");
         }
     }

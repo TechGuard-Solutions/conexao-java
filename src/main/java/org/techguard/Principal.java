@@ -1,6 +1,7 @@
 package org.techguard;
 
 import org.techguard.api.ClassificadorAPI;
+import org.techguard.conexao.ErroNaConexaoBanco;
 import org.techguard.conexao.S3Connection;
 import org.techguard.dao.LeituraETratativaDAO;
 import org.techguard.modelo.Incidente;
@@ -9,25 +10,50 @@ import software.amazon.awssdk.regions.Region;
 
 import java.io.IOException;
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Principal {
+    private static final Logger LOGGER = LogManager.getLogger(Principal.class);
+
     public static void main(String[] args) {
-        String bucketName = "techguard-bucket";
+
+        LOGGER.info("Iniciando a aplicação Principal.");
+
+        String bucketName = "s3-sprint";
         String key = "basededados.xlsx";
         String apiKey = "AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA";
         Region region = Region.US_EAST_1;
 
         try (S3Connection s3Connection = new S3Connection(bucketName, key, region)) {
+            LOGGER.info("Conexão com o S3 estabelecida.");
+
             ClassificadorAPI classificadorAPI = new ClassificadorAPI(apiKey);
             ProcessadorDados processador = new ProcessadorDados(s3Connection, classificadorAPI);
 
+            LOGGER.info("Iniciando o processamento dos dados.");
             List<Incidente> incidentes = processador.processar();
+            LOGGER.info("Processamento dos dados concluído. {} incidentes processados.", incidentes.size());
 
             LeituraETratativaDAO dao = new LeituraETratativaDAO();
-            dao.cadastrarDados(incidentes);
+            LOGGER.info("Iniciando a persistência dos dados no banco de dados.");
+
+            try{
+                dao.cadastrarDados(incidentes);
+                LOGGER.info("Dados persistidos no banco de dados com sucesso.");
+            }catch (RuntimeException e){
+                LOGGER.error("Erro ao persistir dados no banco de dados: " + e.getMessage(), e);
+            }
+
+
+
 
         } catch (IOException e) {
-            System.err.println("Erro ao processar dados: " + e.getMessage());
+            LOGGER.error("Erro ao processar dados: " + e.getMessage(), e);
+
+
         }
+
+        LOGGER.info("Finalizando a aplicação Principal.");
     }
 }
