@@ -19,9 +19,14 @@ public class LeituraETratativaDAO {
         LOGGER.info("Iniciando a persistência dos dados no banco de dados.");
 
         String sql = "INSERT INTO registros (data, nome, attack_ou_disclosure, modificados_affect, modificados_downstream_target, modificados_impact) VALUES (?, ?, ?, ?, ?, ?)";
+        String truncate = "TRUNCATE TABLE registros";
+
         try (Connection conexao = Conexao.getConexao(); // try-with-resources para a Connection
              PreparedStatement ps = conexao.prepareStatement(sql)) {
             LOGGER.info("Conexão com o banco de dados estabelecida com sucesso. URL: {}", conexao.getMetaData().getURL());
+
+            PreparedStatement psTruncate = conexao.prepareStatement(truncate);
+            psTruncate.executeUpdate();
 
             for (Incidente incidente : incidentes) {
                 ps.setDate(1, new java.sql.Date(incidente.getData().getTime())); // Converta para java.sql.Date
