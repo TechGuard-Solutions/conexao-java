@@ -1,8 +1,11 @@
 package org.techguard;
 
+import com.slack.api.Slack;
+import com.slack.api.methods.SlackApiException;
 import org.techguard.api.ClassificadorAPI;
 import org.techguard.conexao.ErroNaConexaoBanco;
 import org.techguard.conexao.S3Connection;
+import org.techguard.slack.slack;
 import org.techguard.dao.LeituraETratativaDAO;
 import org.techguard.modelo.Incidente;
 import org.techguard.tratativa.ProcessadorDados;
@@ -16,8 +19,7 @@ import org.apache.logging.log4j.Logger;
 public class Principal {
     private static final Logger LOGGER = LogManager.getLogger(Principal.class);
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws IOException {
         LOGGER.info("Iniciando a aplicação Principal.");
 
         String bucketName = "s3-sprint";
@@ -37,6 +39,13 @@ public class Principal {
 
             LeituraETratativaDAO dao = new LeituraETratativaDAO();
             LOGGER.info("Iniciando a persistência dos dados no banco de dados.");
+
+            try {
+                slack.enviarMensagemSlack("Processamento concluído com sucesso!");
+                LOGGER.info("Mensagem enviada para o Slack com sucesso.");
+            } catch (IOException | SlackApiException e) {
+                LOGGER.error("Erro ao enviar mensagem para o Slack: {}", e.getMessage(), e);
+            }
 
             try{
                 dao.cadastrarDados(incidentes);

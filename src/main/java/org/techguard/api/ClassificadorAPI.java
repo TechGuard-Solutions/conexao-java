@@ -104,6 +104,6 @@ public class ClassificadorAPI {
                 }
             }
         }
-        return "Others";
+        return "Data Damage";
     }
 }
