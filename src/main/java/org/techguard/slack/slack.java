@@ -8,15 +8,17 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class slack {
+
+    static Dotenv dotenv = Dotenv.load();
 
     private static final Slack slack = Slack.getInstance(); // Tornar 'slack' estático
     private static final Logger LOGGER = LogManager.getLogger(slack.class);
 
-    private static final String TOKEN = "xoxb-7992589832721-8013656421666-FMbcIewbIaaaIrXEAB7kRnwe";
-    private static final String CHANNEL_ID = "D07VD3HBQS3"; // Ler do ambiente
-
+    private static final String TOKEN = dotenv.get("SLACK_BOT_TOKEN");
+    private static final String CHANNEL_ID = dotenv.get("SLACK_CHANNEL_ID"); // Ler do ambiente
 
     public static void enviarMensagemSlack(String mensagem) throws IOException, SlackApiException {
         if (TOKEN == null || CHANNEL_ID == null) {
