@@ -14,8 +14,8 @@ public class slack {
     private static final Slack slack = Slack.getInstance(); // Tornar 'slack' estático
     private static final Logger LOGGER = LogManager.getLogger(slack.class);
 
-    private static final String TOKEN = "piOnDWH4hySuzYmQecdIPdR1";
-    private static final String CHANNEL_ID = "C07UTSUH4LS"; // Ler do ambiente
+    private static final String TOKEN = "xoxb-7992589832721-8013656421666-FMbcIewbIaaaIrXEAB7kRnwe";
+    private static final String CHANNEL_ID = "D07VD3HBQS3"; // Ler do ambiente
 
 
     public static void enviarMensagemSlack(String mensagem) throws IOException, SlackApiException {
