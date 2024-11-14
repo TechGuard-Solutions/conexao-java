@@ -42,7 +42,7 @@ public class Principal {
             LOGGER.info("Iniciando a persistência dos dados no banco de dados.");
 
             try {
-                slack.enviarMensagemSlack("Processamento concluído com sucesso!");
+                slack.enviarMensagemSlack("Processamento concluído com sucesso!\n Agora você poderá analisar os dados em sua dashboard personalizada0\nAcesse: techguard.ddns.net:8080 .");
                 LOGGER.info("Mensagem enviada para o Slack com sucesso.");
             } catch (IOException | SlackApiException e) {
                 LOGGER.error("Erro ao enviar mensagem para o Slack: {}", e.getMessage(), e);
