@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import io.github.cdimascio.dotenv.Dotenv;
 
 public class Principal {
     private static final Logger LOGGER = LogManager.getLogger(Principal.class);
