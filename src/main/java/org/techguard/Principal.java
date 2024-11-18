@@ -23,9 +23,9 @@ public class Principal {
     public static void main(String[] args) throws IOException {
         LOGGER.info("Iniciando a aplicação Principal.");
 
-        String bucketName = "s3-sprint";
+        String bucketName = "bucket-base-de-dados";
         String key = "basededados.xlsx";
-        String apiKey = dotenv.get("GEMINI_API_KEY");
+        String apiKey = "AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA";
         Region region = Region.US_EAST_1;
 
         try (S3Connection s3Connection = new S3Connection(bucketName, key, region)) {
