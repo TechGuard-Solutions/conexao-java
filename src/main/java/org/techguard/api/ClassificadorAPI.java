@@ -23,7 +23,7 @@ public class ClassificadorAPI {
     }
 
     public String classificar(String termo, String categoria) throws IOException, InterruptedException {
-        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA";
+        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg";
         String prompt = gerarPrompt(termo, categoria);
         String jsonInputString = String.format("{\"contents\":[{\"parts\":[{\"text\":\"%s\"}]}]}", prompt);
         LOGGER.info("Chamando API para classificar termo '{}' na categoria '{}'. URL: {}", termo, categoria, apiUrl);
@@ -59,13 +59,15 @@ public class ClassificadorAPI {
                     LOGGER.warn("API retornou 'Too Many Requests'. Tentando novamente em {} segundos...", (long) Math.pow(2, tentativas));// Too Many Requests
                     Thread.sleep((long) Math.pow(2, tentativas) * 1000); // Backoff exponencial
                     tentativas++;
-                } else if (responseCode == 503) { // Service Unavailable
-                    long tempoEspera = (long) Math.pow(2, tentativas) * 1000; // Backoff exponencial - ajuste o fator, se necessário
-                    LOGGER.warn("API retornou 503 (Service Unavailable). Tentando novamente em {} segundos...", tempoEspera / 1000);
-                    Thread.sleep(tempoEspera);
-                    tentativas++;
-
-                } else {
+                }
+//                else if (responseCode == 503) { // Service Unavailable
+//                    long tempoEspera = (long) Math.pow(2, tentativas) * 1000; // Backoff exponencial - ajuste o fator, se necessário
+//                    LOGGER.warn("API retornou 503 (Service Unavailable). Tentando novamente em {} segundos...", tempoEspera / 1000);
+//                    Thread.sleep(tempoEspera);
+//                    tentativas++;
+//
+//                }
+                else {
                     String mensagemErro = String.format("Erro na chamada da API. Código de resposta: %d, Termo: %s, Categoria: %s", responseCode, termo, categoria);
                     LOGGER.error(mensagemErro);
                     throw new IOException("Erro na chamada da API: " + responseCode);
