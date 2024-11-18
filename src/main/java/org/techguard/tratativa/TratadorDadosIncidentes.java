@@ -36,7 +36,7 @@ public class TratadorDadosIncidentes extends TratadorDados {
             Sheet sheet = workbook.getSheetAt(i);
             LOGGER.info("Processando dados da planilha: " + sheet.getSheetName());
 
-            for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
+            for (int rowIndex = 1; rowIndex <= 2; rowIndex++) {
                 Row row = sheet.getRow(rowIndex);
                 if (row != null) {
                     Incidente incidente = new Incidente();

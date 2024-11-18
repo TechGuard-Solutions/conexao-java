@@ -38,7 +38,7 @@ public class TratadorDadosClassificacao extends TratadorDados {
 
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             Sheet sheet = workbook.getSheetAt(i);
-            for (int rowIndex = 1; rowIndex <= 5; rowIndex++) {
+            for (int rowIndex = 1; rowIndex <= 2; rowIndex++) {
 
                 if (rowIndex - 1 >= incidentes.size()) {
                     continue; // Pula se não há incidente para essa linha
