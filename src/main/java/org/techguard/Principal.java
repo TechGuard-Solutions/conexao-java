@@ -24,13 +24,13 @@ public class Principal {
 
         String bucketName = "s3-sprint";
         String key = "basededados.xlsx";
-        String apiKey = dotenv.get("GEMINI_API_KEY");
+        String gemini = "AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg";
         Region region = Region.US_EAST_1;
 
         try (S3Connection s3Connection = new S3Connection(bucketName, key, region)) {
             LOGGER.info("Conexão com o S3 estabelecida.");
 
-            ClassificadorAPI classificadorAPI = new ClassificadorAPI(apiKey);
+            ClassificadorAPI classificadorAPI = new ClassificadorAPI(gemini);
             ProcessadorDados processador = new ProcessadorDados(s3Connection, classificadorAPI);
 
             LOGGER.info("Iniciando o processamento dos dados.");
