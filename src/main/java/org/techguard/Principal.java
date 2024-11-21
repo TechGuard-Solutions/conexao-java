@@ -22,7 +22,7 @@ public class Principal {
     public static void main(String[] args) throws IOException {
         LOGGER.info("Iniciando a aplicação Principal.");
 
-        String bucketName = "s3-sprint";
+        String bucketName = "techguard-bucket";
         String key = "basededados.xlsx";
         String apiKey = "AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA";
         Region region = Region.US_EAST_1;
