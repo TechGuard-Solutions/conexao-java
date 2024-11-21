@@ -17,7 +17,6 @@ import org.apache.logging.log4j.Logger;
 
 public class Principal {
     private static final Logger LOGGER = LogManager.getLogger(Principal.class);
-    static Dotenv dotenv = Dotenv.load();
 
     public static void main(String[] args) throws IOException {
         LOGGER.info("Iniciando a aplicação Principal.");
