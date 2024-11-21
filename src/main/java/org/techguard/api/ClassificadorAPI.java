@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,16 +21,17 @@ public class ClassificadorAPI {
     public ClassificadorAPI(String apiKey) {
         this.apiKey = apiKey;
     }
+
     public String classificar(String termo, String categoria) throws IOException, InterruptedException {
-        String apiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA";
+        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.0-pro-latest:generateContent?key=AIzaSyB8ockrzlb0PdYnkkm-AfKqSRrgQ6B0bRg";
         String prompt = gerarPrompt(termo, categoria);
         String jsonInputString = String.format("{\"contents\":[{\"parts\":[{\"text\":\"%s\"}]}]}", prompt);
-        LOGGER.info("Chamando API para classificar termo '{}' na categoria '{}'. URL: {}", termo, categoria, apiUrl);
+        LOGGER.info("Chamando API para classificar termo '{}' na categoria '{}'. URL: {}", termo, categoria, endpoint);
 
         int tentativas = 0;
         while (tentativas < 10) {
             try {
-                URL url = new URL(apiUrl);
+                URL url = new URL(endpoint);
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/json");
@@ -57,7 +59,15 @@ public class ClassificadorAPI {
                     LOGGER.warn("API retornou 'Too Many Requests'. Tentando novamente em {} segundos...", (long) Math.pow(2, tentativas));// Too Many Requests
                     Thread.sleep((long) Math.pow(2, tentativas) * 1000); // Backoff exponencial
                     tentativas++;
-                } else {
+                }
+//                else if (responseCode == 503) { // Service Unavailable
+//                    long tempoEspera = (long) Math.pow(2, tentativas) * 1000; // Backoff exponencial - ajuste o fator, se necessário
+//                    LOGGER.warn("API retornou 503 (Service Unavailable). Tentando novamente em {} segundos...", tempoEspera / 1000);
+//                    Thread.sleep(tempoEspera);
+//                    tentativas++;
+//
+//                }
+                else {
                     String mensagemErro = String.format("Erro na chamada da API. Código de resposta: %d, Termo: %s, Categoria: %s", responseCode, termo, categoria);
                     LOGGER.error(mensagemErro);
                     throw new IOException("Erro na chamada da API: " + responseCode);
@@ -81,7 +91,7 @@ public class ClassificadorAPI {
             case "Affect":
                 return String.format("Classify the term: '%s' into one of the following categories:\n1. Software and Applications\n2. Malware and Vulnerabilities\n3. Frameworks and Libraries\n4. Hardware and Firmware\n5. Protocols and APIs\n6. Development Tools and Packages\nRespond with the category name only(without numbers or special characters).", termo);
             case "Downstream Target":
-                return String.format("Classify the term: '%s' into one of the following categories:\n1. Systems and Platform Users\n2. Software Applications and Libraries\n3. companies and organizations\n4. Cryptocurrency and Finance Users\n5. Governments, Activists and Non-Governmental Organizations (NGOs)\n6. Developers and IT Professionals\nRespond with the category name only(without numbers or special characters).", termo);
+                return String.format("Classify the term: '%s' into one of the following categories:\n1. Systems and Platform Users\n2. Software Applications and Libraries\n3. Companies and organizations\n4. Cryptocurrency and Finance Users\n5. Governments, Activists and Non-Governmental Organizations (NGOs)\n6. Developers and IT Professionals\nRespond with the category name only(without numbers or special characters).", termo);
             case "Impact":
                 return String.format("Classify the term: '%s' into one of the following categories:\n1. Data Extraction\n2. Remote Code Execution\n3. Backdoor Access\n4. Data Damage\n5. Payment Diversion\n6. Others\nRespond with the category name only(without numbers or special characters).", termo);
             default:

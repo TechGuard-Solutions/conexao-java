@@ -11,7 +11,7 @@ public class Conexao {
 
     private static final String url = "jdbc:mysql://localhost:3306/techguard"; // adicionando o prefixo jdbc:mysql://
     private static final String user = "root";
-    private static final String password = "16012004";
+    private static final String password = "A1R5R2U4T3";
 
     private static Connection conn;
 

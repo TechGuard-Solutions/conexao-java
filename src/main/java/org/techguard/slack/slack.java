@@ -8,25 +8,27 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class slack {
+
+    static Dotenv dotenv = Dotenv.load();
 
     private static final Slack slack = Slack.getInstance(); // Tornar 'slack' estático
     private static final Logger LOGGER = LogManager.getLogger(slack.class);
 
-    private static final String TOKEN = "piOnDWH4hySuzYmQecdIPdR1";
-    private static final String CHANNEL_ID = "C07UTSUH4LS"; // Ler do ambiente
-
+    private static final String CODIGO = "xoxb-7992589832721-8050099410404-570DTS1Re6NOdz74nq3oIz3t";
+    private static final String CANAL = "D081S81KQKB"; // Ler do ambiente
 
     public static void enviarMensagemSlack(String mensagem) throws IOException, SlackApiException {
-        if (TOKEN == null || CHANNEL_ID == null) {
-            LOGGER.error("Token ou Channel ID não configurados. Verifique as variáveis de ambiente SLACK_BOT_TOKEN e SLACK_CHANNEL_ID.");
+        if (CODIGO == null || CANAL == null) {
+            LOGGER.error("Token ou Channel ID não configurados. Verifique as variáveis de ambiente SLACK_BOT_CODIGO e SLACK_CANAL.");
             return; // Ou lance uma exceção
         }
 
-        MethodsClient methods = slack.methods(TOKEN);
+        MethodsClient methods = slack.methods(CODIGO);
         ChatPostMessageRequest request = ChatPostMessageRequest.builder()
-                .channel(CHANNEL_ID)
+                .channel(CANAL)
                 .text(mensagem)
                 .build();
 

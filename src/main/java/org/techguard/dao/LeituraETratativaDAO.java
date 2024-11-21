@@ -37,7 +37,6 @@ public class LeituraETratativaDAO {
                 ps.setString(6, incidente.getImpact());
                 ps.executeUpdate();
                 LOGGER.debug("Incidente inserido no banco de dados: {}", incidente);
-
             }
 
             ps.close();
