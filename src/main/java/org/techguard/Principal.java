@@ -21,9 +21,9 @@ public class Principal {
     public static void main(String[] args) throws IOException {
         LOGGER.info("Iniciando a aplicação Principal.");
 
-        String bucketName = "techguard-bucket";
+        String bucketName = "s3-sprint";
         String key = "basededados.xlsx";
-        String gemini = "AIzaSyDlti8js0JJDsZDviQ9bbUOzN6P2YXzUtA";
+        String gemini = "AIzaSyBd26QJ_oMYDFfRGcNhI3p3iSiW3ZQ59nQ";
         Region region = Region.US_EAST_1;
 
         try (S3Connection s3Connection = new S3Connection(bucketName, key, region)) {

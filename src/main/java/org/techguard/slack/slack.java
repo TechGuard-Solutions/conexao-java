@@ -8,16 +8,13 @@ import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
-import io.github.cdimascio.dotenv.Dotenv;
 
 public class slack {
 
-    static Dotenv dotenv = Dotenv.load();
-
     private static final Slack slack = Slack.getInstance(); // Tornar 'slack' estático
     private static final Logger LOGGER = LogManager.getLogger(slack.class);
-
-    private static final String CODIGO = "xoxb-7992589832721-8050099410404-570DTS1Re6NOdz74nq3oIz3t";
+//xoxb-7992589832721-8050099410404-bMWBzEoEDWl3iQYSfk3n6jmR
+    private static final String CODIGO = "";
     private static final String CANAL = "D081S81KQKB"; // Ler do ambiente
 
     public static void enviarMensagemSlack(String mensagem) throws IOException, SlackApiException {
