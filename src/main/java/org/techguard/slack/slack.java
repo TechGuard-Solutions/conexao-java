@@ -13,7 +13,6 @@ public class slack {
 
     private static final Slack slack = Slack.getInstance(); // Tornar 'slack' estático
     private static final Logger LOGGER = LogManager.getLogger(slack.class);
-//xoxb-7992589832721-8050099410404-bMWBzEoEDWl3iQYSfk3n6jmR
     private static final String CODIGO = "";
     private static final String CANAL = "D081S81KQKB"; // Ler do ambiente
 

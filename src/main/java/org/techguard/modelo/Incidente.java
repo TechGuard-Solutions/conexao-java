@@ -9,6 +9,33 @@ public class Incidente {
     private String affected;
     private String downstreamTarget;
     private String impact;
+    private String prevencao;
+    private String leis;
+    private String deteccao;
+
+    public String getPrevencao() {
+        return prevencao;
+    }
+
+    public void setPrevencao(String prevencao) {
+        this.prevencao = prevencao;
+    }
+
+    public String getLeis() {
+        return leis;
+    }
+
+    public void setLeis(String leis) {
+        this.leis = leis;
+    }
+
+    public String getDeteccao() {
+        return deteccao;
+    }
+
+    public void setDeteccao(String deteccao) {
+        this.deteccao = deteccao;
+    }
 
     public Date getData() {
         return data;
@@ -67,6 +94,9 @@ public class Incidente {
                 ", affected='" + affected + '\'' +
                 ", downstreamTarget='" + downstreamTarget + '\'' +
                 ", impact='" + impact + '\'' +
+                ", prevencao='" + prevencao + '\'' +
+                ", leis='" + leis + '\'' +
+                ", deteccao='" + deteccao + '\'' +
                 '}';
     }
 }

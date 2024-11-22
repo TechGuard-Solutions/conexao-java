@@ -35,7 +35,29 @@ public class TratadorDadosClassificacao extends TratadorDados {
         if (incidentes == null || incidentes.isEmpty()) {
             return incidentes;
         }
+        try {
+            // Chama os prompts extras apenas uma vez
+            String prevencao = classificadorAPI.classificar(null, "Prevenção");
+            String leis = classificadorAPI.classificar(null, "Leis");
+            String deteccao = classificadorAPI.classificar(null, "Detecção");
 
+
+            LOGGER.info("Resposta para o prompt extra 1: {}", prevencao);
+            LOGGER.info("Resposta para o prompt extra 2: {}", leis);
+            LOGGER.info("Resposta para o prompt extra 3: {}", deteccao);
+
+            for (Incidente incidente : incidentes) {
+                incidente.setPrevencao(prevencao); // Define o campo com a resposta
+                incidente.setLeis(leis);
+                incidente.setDeteccao(deteccao);
+
+            }
+
+        } catch (InterruptedException e) {
+            LOGGER.error("Erro ao chamar os prompts extras: {}", e.getMessage(), e);
+            // Trate a exceção conforme necessário (retornar null, lançar exceção, etc.)
+            return null;
+        }
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             Sheet sheet = workbook.getSheetAt(i);
             for (int rowIndex = 1; rowIndex <= 2; rowIndex++) {

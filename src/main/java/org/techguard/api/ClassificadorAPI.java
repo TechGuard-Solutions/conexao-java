@@ -94,6 +94,12 @@ public class ClassificadorAPI {
                 return String.format("Classify the term: '%s' into one of the following categories:\n1. Systems and Platform Users\n2. Software Applications and Libraries\n3. Companies and organizations\n4. Cryptocurrency and Finance Users\n5. Governments, Activists and Non-Governmental Organizations (NGOs)\n6. Developers and IT Professionals\nRespond with the category name only(without numbers or special characters).", termo);
             case "Impact":
                 return String.format("Classify the term: '%s' into one of the following categories:\n1. Data Extraction\n2. Remote Code Execution\n3. Backdoor Access\n4. Data Damage\n5. Payment Diversion\n6. Others\nRespond with the category name only(without numbers or special characters).", termo);
+            case "Prevenção":
+                return "Como posso me prevenir de ataques na minha empresa?";
+            case "Leis":
+                return "Quais leis impedem que eu seja hackeado?";
+            case "Detecção":
+                return "Como saber se minhas informações foram hackeadas?";
             default:
                 return "";
         }

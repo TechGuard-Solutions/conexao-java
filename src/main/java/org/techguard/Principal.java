@@ -3,6 +3,7 @@ package org.techguard;
 import com.slack.api.methods.SlackApiException;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.techguard.api.ClassificadorAPI;
+import org.techguard.conexao.ErroNaConexaoBanco;
 import org.techguard.slack.slack;
 import org.techguard.conexao.S3Connection;
 import org.techguard.dao.LeituraETratativaDAO;
@@ -51,6 +52,8 @@ public class Principal {
                 LOGGER.info("Dados persistidos no banco de dados com sucesso.");
             }catch (RuntimeException e){
                 LOGGER.error("Erro ao persistir dados no banco de dados: " + e.getMessage(), e);
+            } catch (ErroNaConexaoBanco e) {
+                throw new RuntimeException(e);
             }
         } catch (IOException e) {
             LOGGER.error("Erro ao processar dados: " + e.getMessage(), e);
