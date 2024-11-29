@@ -11,7 +11,6 @@ import java.util.List;
 public abstract class TratadorDados {
     protected S3Connection s3Connection;
     protected ClassificadorAPI classificadorAPI;
-//    protected qntLinhasParaTratar = 5;
 
     public TratadorDados(S3Connection s3Connection, ClassificadorAPI classificadorAPI) {
         this.s3Connection = s3Connection;

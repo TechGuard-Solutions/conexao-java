@@ -14,7 +14,7 @@ public class slack {
     private static final Slack slack = Slack.getInstance(); // Tornar 'slack' estático
     private static final Logger LOGGER = LogManager.getLogger(slack.class);
     private static final String CODIGO = "";
-    private static final String CANAL = "D081S81KQKB"; // Ler do ambiente
+    private static final String CANAL = "D083ADEQWSV"; // Ler do ambiente
 
     public static void enviarMensagemSlack(String mensagem) throws IOException, SlackApiException {
         if (CODIGO == null || CANAL == null) {

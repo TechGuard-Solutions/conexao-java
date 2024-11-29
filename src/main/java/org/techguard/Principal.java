@@ -24,7 +24,7 @@ public class Principal {
 
         String bucketName = "s3-sprint";
         String key = "basededados.xlsx";
-        String gemini = "AIzaSyBd26QJ_oMYDFfRGcNhI3p3iSiW3ZQ59nQ";
+        String gemini = "AIzaSyAzB0MJCPbIT9wyX69NbqkIIO7okm5HRgk\n";
         Region region = Region.US_EAST_1;
 
         try (S3Connection s3Connection = new S3Connection(bucketName, key, region)) {
