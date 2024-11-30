@@ -118,6 +118,8 @@ public class ClassificadorAPI {
                         return parts.getJSONObject(0).getString("text").trim();
                     }
                 }
+            }else {
+                return "Data Damage";
             }
         }
         return "Data Damage";
