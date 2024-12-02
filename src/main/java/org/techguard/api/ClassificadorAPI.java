@@ -60,13 +60,6 @@ public class ClassificadorAPI {
                     Thread.sleep((long) Math.pow(2, tentativas) * 1000); // Backoff exponencial
                     tentativas++;
                 }
-//                else if (responseCode == 503) { // Service Unavailable
-//                    long tempoEspera = (long) Math.pow(2, tentativas) * 1000; // Backoff exponencial - ajuste o fator, se necessário
-//                    LOGGER.warn("API retornou 503 (Service Unavailable). Tentando novamente em {} segundos...", tempoEspera / 1000);
-//                    Thread.sleep(tempoEspera);
-//                    tentativas++;
-//
-//                }
                 else {
                     String mensagemErro = String.format("Erro na chamada da API. Código de resposta: %d, Termo: %s, Categoria: %s", responseCode, termo, categoria);
                     LOGGER.error(mensagemErro);
@@ -93,7 +86,7 @@ public class ClassificadorAPI {
             case "Downstream Target":
                 return String.format("Classify the term: '%s' into one of the following categories:\n1. Systems and Platform Users\n2. Software Applications and Libraries\n3. Companies and organizations\n4. Cryptocurrency and Finance Users\n5. Governments, Activists and Non-Governmental Organizations (NGOs)\n6. Developers and IT Professionals\nRespond with the category name only(without numbers or special characters).", termo);
             case "Impact":
-                return String.format("Classify the term: '%s' into one of the following categories:\n1. Data Extraction\n2. Remote Code Execution\n3. Backdoor Access\n4. Data Damage\n5. Payment Diversion\n6. Others\nRespond with the category name only(without numbers or special characters).", termo);
+                return String.format("Classify the term: '%s' into one of the following categories:\n1. Data Extraction\n2. Remote Code Execution\n3. Backdoor Access\n4. Data Damage\n5. Payment Diversion\nRespond with the category name only(without numbers or special characters).", termo);
             case "Prevenção":
                 return "Como posso me prevenir de ataques na minha empresa?";
             case "Leis":

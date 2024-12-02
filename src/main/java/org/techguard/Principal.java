@@ -22,7 +22,7 @@ public class Principal {
     public static void main(String[] args) throws IOException {
         LOGGER.info("Iniciando a aplicação Principal.");
 
-        String bucketName = "s3-sprint";
+        String bucketName = "bucket-base-de-dados";
         String key = "basededados.xlsx";
         String gemini = "AIzaSyAzB0MJCPbIT9wyX69NbqkIIO7okm5HRgk\n";
         Region region = Region.US_EAST_1;
