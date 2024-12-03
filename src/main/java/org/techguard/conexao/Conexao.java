@@ -9,9 +9,9 @@ import org.apache.logging.log4j.Logger;
 public class Conexao {
     private static final Logger LOGGER = LogManager.getLogger(Conexao.class);
 
-    private static final String url = "jdbc:mysql://localhost:3306/techguard"; // adicionando o prefixo jdbc:mysql://
+    private static final String url = "jdbc:mysql://TechGuardDB/techguard"; // adicionando o prefixo jdbc:mysql://
     private static final String user = "root";
-    private static final String password = "A1R5R2U4T3";
+    private static final String password = "solutions";
 
     private static Connection conn;
 
